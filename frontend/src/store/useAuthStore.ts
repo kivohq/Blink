@@ -21,7 +21,13 @@ interface AuthState {
   signup: (data: any) => Promise<boolean>;
   login: (data: any) => Promise<boolean>;
   logout: () => Promise<void>;
-  updateProfile: (data: { profilePic: string }) => Promise<void>;
+  updateProfile: (data: { 
+    profilePic?: string, 
+    username?: string, 
+    handle?: string, 
+    publicProfile?: { bio?: string },
+    privateProfile?: { isPrivate?: boolean }
+  }) => Promise<void>;
   connectSocket: () => void;
   disconnectSocket: () => void;
 }

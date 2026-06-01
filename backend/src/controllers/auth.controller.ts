@@ -108,15 +108,28 @@ export const getUserByUsername = catchAsync(async (req: AuthRequest, res: Respon
 });
 
 export const updateProfile = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const allowedUpdates = ['username', 'handle', 'publicProfile', 'privateProfile'];
+  const allowedUpdates = ['username', 'handle', 'publicProfile', 'privateProfile', 'profilePic'];
   const updates = req.body;
   const updateData: any = {};
+  
   // Filter allowed fields
   for (const key of allowedUpdates) {
     if (updates[key] !== undefined) {
       updateData[key] = updates[key];
     }
   }
+
+  // Handle profilePic upload to Cloudinary
+  if (updateData.profilePic) {
+    try {
+      const uploadResponse = await cloudinary.uploader.upload(updateData.profilePic);
+      updateData.profilePic = uploadResponse.secure_url;
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      return next(new AppError("Failed to upload image", 500));
+    }
+  }
+
   // Ensure uniqueness for username and handle if provided
   if (updateData.username) {
     const existing = await User.findOne({ username: updateData.username, _id: { $ne: req.user!._id } });
@@ -126,6 +139,7 @@ export const updateProfile = catchAsync(async (req: AuthRequest, res: Response, 
     const existing = await User.findOne({ handle: updateData.handle, _id: { $ne: req.user!._id } });
     if (existing) return next(new AppError('Handle already taken', 400));
   }
+
   const updatedUser = await User.findByIdAndUpdate(req.user!._id, updateData, { new: true, runValidators: true })
     .select('-password');
   res.status(200).json(updatedUser);

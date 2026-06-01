@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
 import toast from "react-hot-toast";
@@ -8,6 +8,61 @@ const MAX_FILE_SIZE_MB = 7;
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
+  
+  // Local state for debounced fields
+  const [username, setUsername] = useState(authUser?.username || "");
+  const [handle, setHandle] = useState(authUser?.handle || "");
+  const [bio, setBio] = useState(authUser?.publicProfile?.bio || "");
+  
+  const isFirstRender = useRef(true);
+
+  // Sync local state with authUser on initial load or if authUser changes from elsewhere
+  useEffect(() => {
+    if (authUser) {
+      setUsername(authUser.username || "");
+      setHandle(authUser.handle || "");
+      setBio(authUser.publicProfile?.bio || "");
+    }
+  }, [authUser]);
+
+  // Debounced update for username
+  useEffect(() => {
+    if (isFirstRender.current) return;
+    if (username === authUser?.username) return;
+
+    const timer = setTimeout(() => {
+      updateProfile({ username });
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [username, updateProfile, authUser?.username]);
+
+  // Debounced update for handle
+  useEffect(() => {
+    if (isFirstRender.current) return;
+    if (handle === authUser?.handle) return;
+
+    const timer = setTimeout(() => {
+      updateProfile({ handle });
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [handle, updateProfile, authUser?.handle]);
+
+  // Debounced update for bio
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (bio === authUser?.publicProfile?.bio) return;
+
+    const timer = setTimeout(() => {
+      updateProfile({ publicProfile: { bio } });
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [bio, updateProfile, authUser?.publicProfile?.bio]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -101,8 +156,9 @@ const ProfilePage = () => {
               </div>
               <input
                 type="text"
-                value={authUser?.username || ""}
-                onChange={(e) => updateProfile({ username: e.target.value })}
+                value={username}
+                maxLength={30}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
               />
             </div>
@@ -114,8 +170,9 @@ const ProfilePage = () => {
               </div>
               <input
                 type="text"
-                value={authUser?.handle || ""}
-                onChange={(e) => updateProfile({ handle: e.target.value })}
+                value={handle}
+                maxLength={20}
+                onChange={(e) => setHandle(e.target.value)}
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
               />
             </div>
@@ -127,8 +184,9 @@ const ProfilePage = () => {
               </div>
               <textarea
                 rows={3}
-                value={authUser?.publicProfile?.bio || ""}
-                onChange={(e) => updateProfile({ publicProfile: { bio: e.target.value } })}
+                value={bio}
+                maxLength={500}
+                onChange={(e) => setBio(e.target.value)}
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
               />
             </div>

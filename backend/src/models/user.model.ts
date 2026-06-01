@@ -71,15 +71,17 @@ const userSchema = new Schema<IUserDocument>(
       type: String,
       unique: true,
       required: true,
+      maxlength: 30,
     },
     handle: {
       type: String,
       unique: true,
       required: true,
+      maxlength: 20,
     },
     publicProfile: {
       type: new Schema({
-        bio: { type: String, default: '' },
+        bio: { type: String, default: '', maxlength: 500 },
         avatar: { type: String, default: '' },
       }, { _id: false }),
       default: {},
