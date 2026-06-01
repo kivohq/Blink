@@ -79,8 +79,22 @@ export interface IWorkspace {
   icon?: string;
   description?: string;
   owner: string | Types.ObjectId;
+  admins: (string | Types.ObjectId)[];
   members: (string | Types.ObjectId | IUser)[];
   channels: IChannel[];
+  maxMembers: number;
+  pendingApproval: boolean;
+  joinRequests: (string | Types.ObjectId)[];
+  permissions: {
+    canEditInfo: 'admins' | 'everyone';
+    canSendMessages: 'admins' | 'everyone';
+    canAddMembers: 'admins' | 'everyone';
+  };
+  disappearingMessages: {
+    enabled: boolean;
+    duration: number;
+  };
+  communityId?: string | Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -147,6 +161,7 @@ export interface IWorkspaceMessage {
   isEdited: boolean;
   editedAt?: Date;
   replyTo?: string | Types.ObjectId | IWorkspaceMessage;
+  expiresAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
