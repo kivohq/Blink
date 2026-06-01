@@ -94,7 +94,8 @@ export const getUsersForSidebar = async (req: AuthRequest, res: Response): Promi
     })
       .sort({ createdAt: -1 })
       .populate("senderId", "fullName profilePic email")
-      .populate("receiverId", "fullName profilePic email");
+      .populate("receiverId", "fullName profilePic email")
+      .lean();
 
     // Get unique users from messages and organize by chat
     const userMap = new Map();
@@ -104,18 +105,18 @@ export const getUsersForSidebar = async (req: AuthRequest, res: Response): Promi
       const otherUser = msg.senderId._id.toString() === loggedInUserId.toString() ? msg.receiverId : msg.senderId;
       if (otherUser && !userMap.has(otherUser._id.toString())) {
         userMap.set(otherUser._id.toString(), {
-          ...otherUser.toObject(),
+          ...otherUser,
           lastMessage: msg,
         });
       }
     });
 
     // Get all other users and add them if not in recent chats
-    const allUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    const allUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password").lean();
     allUsers.forEach((user: any) => {
       if (!userMap.has(user._id.toString())) {
         userMap.set(user._id.toString(), {
-          ...user.toObject(),
+          ...user,
           lastMessage: null,
         });
       }

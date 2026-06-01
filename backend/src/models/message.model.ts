@@ -110,6 +110,9 @@ const messageSchema = new Schema<IMessageDocument>(
   { timestamps: true }
 );
 
+messageSchema.index({ senderId: 1, createdAt: -1 });
+messageSchema.index({ receiverId: 1, createdAt: -1 });
+
 const Message: Model<IMessageDocument> = mongoose.models.Message || mongoose.model<IMessageDocument>("Message", messageSchema);
 
 export default Message;

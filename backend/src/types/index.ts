@@ -76,6 +76,7 @@ export interface IMessage {
 export interface IWorkspace {
   _id: string | Types.ObjectId;
   name: string;
+  handle?: string;
   icon?: string;
   description?: string;
   owner: string | Types.ObjectId;

@@ -63,6 +63,8 @@ const workspaceMessageSchema = new Schema<IWorkspaceMessageDocument>(
   { timestamps: true }
 );
 
+workspaceMessageSchema.index({ workspaceId: 1, channelId: 1, createdAt: 1 });
+
 const WorkspaceMessage: Model<IWorkspaceMessageDocument> = mongoose.models.WorkspaceMessage || mongoose.model<IWorkspaceMessageDocument>("WorkspaceMessage", workspaceMessageSchema);
 
 export default WorkspaceMessage;

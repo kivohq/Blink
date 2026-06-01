@@ -127,13 +127,19 @@ export const getWorkspaces = catchAsync(async (req: AuthRequest, res: Response) 
 });
 
 export const createWorkspace = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const { name, icon, description } = req.body;
+  const { name, icon, description, handle } = req.body;
   const userId = req.user?._id;
 
   if (!name) return next(new AppError("Workspace name is required", 400));
+  
+  if (handle) {
+    const existingHandle = await Workspace.findOne({ handle });
+    if (existingHandle) return next(new AppError("Group handle is already taken", 400));
+  }
 
   const newWorkspace = new Workspace({
     name,
+    handle: handle || null,
     icon: icon || "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
     description: description || "",
     owner: userId,

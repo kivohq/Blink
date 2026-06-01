@@ -4,10 +4,8 @@ import User from "../models/user.model.js";
 import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
 
-// Extend Express Request type to include user
-export interface AuthRequest extends Request {
-  user?: any;
-}
+// Now using standard Express Request, extended via types/express.d.ts
+export type AuthRequest = Request;
 
 export const protectRoute = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
   let token = req.cookies.jwt;

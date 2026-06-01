@@ -29,6 +29,11 @@ const workspaceSchema = new Schema<IWorkspaceDocument>(
       type: String,
       required: true,
     },
+    handle: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     icon: {
       type: String,
       default: "",

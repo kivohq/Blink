@@ -64,6 +64,7 @@ export interface IMessage {
 export interface IWorkspace {
   _id: string;
   name: string;
+  handle?: string;
   icon?: string;
   description?: string;
   owner: string;
