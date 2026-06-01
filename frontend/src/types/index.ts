@@ -67,8 +67,22 @@ export interface IWorkspace {
   icon?: string;
   description?: string;
   owner: string;
+  admins: string[];
   members: (string | IUser)[];
   channels: IChannel[];
+  maxMembers: number;
+  pendingApproval: boolean;
+  joinRequests: string[];
+  permissions: {
+    canEditInfo: 'admins' | 'everyone';
+    canSendMessages: 'admins' | 'everyone';
+    canAddMembers: 'admins' | 'everyone';
+  };
+  disappearingMessages: {
+    enabled: boolean;
+    duration: number;
+  };
+  communityId?: string;
   createdAt: string;
   updatedAt: string;
 }

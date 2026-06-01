@@ -54,6 +54,11 @@ const workspaceMessageSchema = new Schema<IWorkspaceMessageDocument>(
       ref: "WorkspaceMessage",
       default: null,
     },
+    expiresAt: {
+      type: Date,
+      default: null,
+      index: { expires: 0 } // This will automatically delete the document at expiresAt
+    },
   },
   { timestamps: true }
 );

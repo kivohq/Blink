@@ -81,6 +81,9 @@ interface ChatState {
   createPoll: (workspaceId: string, channelId: string, question: string, optionLabels: string[]) => Promise<void>;
   voteInPoll: (workspaceId: string, channelId: string, pollId: string, optionId: string) => Promise<void>;
   uploadResource: (workspaceId: string, channelId: string, file: File) => Promise<void>;
+  deleteWorkspace: (workspaceId: string) => Promise<void>;
+  promoteToAdmin: (workspaceId: string, userId: string) => Promise<void>;
+  demoteFromAdmin: (workspaceId: string, userId: string) => Promise<void>;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -994,6 +997,45 @@ export const useChatStore = create<ChatState>((set, get) => ({
       toast.success(`Uploaded ${file.name}!`);
     } catch (error) {
       console.error("Failed to upload resource:", error);
+    }
+  },
+
+  deleteWorkspace: async (workspaceId) => {
+    try {
+      await axiosInstance.delete(`/workspaces/${workspaceId}`);
+      set({
+        workspaces: get().workspaces.filter(w => w._id !== workspaceId),
+        selectedWorkspace: get().selectedWorkspace?._id === workspaceId ? null : get().selectedWorkspace
+      });
+      toast.success("Group deleted successfully");
+    } catch (error: any) {
+      useErrorStore.getState().handleApiError(error, "delete group");
+    }
+  },
+
+  promoteToAdmin: async (workspaceId, userId) => {
+    try {
+      const res = await axiosInstance.put(`/workspaces/${workspaceId}/promote/${userId}`);
+      set({
+        workspaces: get().workspaces.map(w => w._id === workspaceId ? res.data : w),
+        selectedWorkspace: get().selectedWorkspace?._id === workspaceId ? res.data : get().selectedWorkspace
+      });
+      toast.success("Member promoted to Admin");
+    } catch (error: any) {
+      useErrorStore.getState().handleApiError(error, "promote member");
+    }
+  },
+
+  demoteFromAdmin: async (workspaceId, userId) => {
+    try {
+      const res = await axiosInstance.put(`/workspaces/${workspaceId}/demote/${userId}`);
+      set({
+        workspaces: get().workspaces.map(w => w._id === workspaceId ? res.data : w),
+        selectedWorkspace: get().selectedWorkspace?._id === workspaceId ? res.data : get().selectedWorkspace
+      });
+      toast.success("Admin demoted to member");
+    } catch (error: any) {
+      useErrorStore.getState().handleApiError(error, "demote admin");
     }
   },
 }));

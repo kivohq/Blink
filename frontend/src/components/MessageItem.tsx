@@ -156,30 +156,6 @@ const MessageContent = ({
     openMessageMenu(message._id, { top: e.clientY, left: e.clientX });
   };
 
-  const linkify = (text) => {
-    if (!text) return "";
-    const urlRegex = /(https?:\/\/[^\s<]+[^.,:;"'!)\]\s])/g;
-    return text.split(urlRegex).map((part, i) => {
-      if (part.match(urlRegex)) {
-        return (
-          <a
-            key={i}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`underline decoration-2 underline-offset-2 transition-opacity hover:opacity-80 font-semibold ${
-              isSelf ? "text-white" : "text-primary dark:text-primary"
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {part}
-          </a>
-        );
-      }
-      return part;
-    });
-  };
-
   return (
     <>
       {/* Header: Sender name */}
@@ -293,12 +269,14 @@ const MessageContent = ({
               )}
               {message.text && (
                 <div className="flex flex-col">
-                  <p className="text-[15px] leading-[1.5] break-words font-medium pr-4">
-                    {linkify(message.text)}
+                  <div className="text-[15px] leading-[1.5] break-words font-medium pr-4 prose dark:prose-invert max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {message.text}
+                    </ReactMarkdown>
                     {message.isEdited && !message.isDeleted && (
                       <span className="text-[10px] opacity-70 ml-1.5 font-normal">edited</span>
                     )}
-                  </p>
+                  </div>
                   {!message.isDeleted && (() => {
                     const urlRegex = /(https?:\/\/[^\s<]+[^.,:;"'!)\]\s])/;
                     const match = message.text.match(urlRegex);

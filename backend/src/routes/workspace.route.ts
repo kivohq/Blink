@@ -3,6 +3,9 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 import {
   getWorkspaces,
   createWorkspace,
+  deleteWorkspace,
+  promoteToAdmin,
+  demoteFromAdmin,
   createChannel,
   joinWorkspace,
   getChannelMessages,
@@ -21,6 +24,9 @@ const router = express.Router();
 
 router.get("/", protectRoute, getWorkspaces);
 router.post("/", protectRoute, createWorkspace);
+router.delete("/:workspaceId", protectRoute, deleteWorkspace);
+router.put("/:workspaceId/promote/:userId", protectRoute, promoteToAdmin);
+router.put("/:workspaceId/demote/:userId", protectRoute, demoteFromAdmin);
 router.post("/:workspaceId/channels", protectRoute, createChannel);
 router.post("/:workspaceId/join", protectRoute, joinWorkspace);
 

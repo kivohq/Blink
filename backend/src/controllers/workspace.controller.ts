@@ -137,6 +137,7 @@ export const createWorkspace = catchAsync(async (req: AuthRequest, res: Response
     icon: icon || "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
     description: description || "",
     owner: userId,
+    admins: [userId],
     members: [userId],
     channels: [
       { name: "announcements", type: "chat", topic: "Official announcements." },
@@ -154,7 +155,7 @@ export const createWorkspace = catchAsync(async (req: AuthRequest, res: Response
       senderId: userId,
       workspaceId: newWorkspace._id,
       channelId: annChan._id,
-      text: `🎉 Server **${name}** has been successfully created. Welcome your team members and configure custom channels!`,
+      text: `🎉 Group **${name}** has been successfully created. Welcome your team members!`,
     });
     await initMsg.save();
   }
@@ -164,6 +165,71 @@ export const createWorkspace = catchAsync(async (req: AuthRequest, res: Response
   io.emit("newWorkspaceCreated", populated);
 
   res.status(201).json(populated);
+});
+
+export const deleteWorkspace = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const { workspaceId } = req.params;
+  const userId = req.user?._id;
+
+  const workspace = await Workspace.findById(workspaceId);
+  if (!workspace) return next(new AppError("Group not found", 404));
+
+  if (workspace.owner.toString() !== userId.toString()) {
+    return next(new AppError("Only the owner can delete the group", 403));
+  }
+
+  await Workspace.findByIdAndDelete(workspaceId);
+  await WorkspaceMessage.deleteMany({ workspaceId });
+  await WorkspacePoll.deleteMany({ workspaceId });
+  await WorkspaceResource.deleteMany({ workspaceId });
+
+  io.emit("workspaceDeleted", { workspaceId });
+
+  res.status(200).json({ message: "Group deleted successfully" });
+});
+
+export const promoteToAdmin = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const { workspaceId, userId } = req.params;
+  const requesterId = req.user?._id;
+
+  const workspace = await Workspace.findById(workspaceId);
+  if (!workspace) return next(new AppError("Group not found", 404));
+
+  if (workspace.owner.toString() !== requesterId.toString()) {
+    return next(new AppError("Only the owner can promote admins", 403));
+  }
+
+  if (workspace.admins.includes(userId as any)) {
+    return next(new AppError("User is already an admin", 400));
+  }
+
+  workspace.admins.push(userId as any);
+  await workspace.save();
+
+  const populated = await Workspace.findById(workspaceId).populate("members", "fullName email profilePic status");
+  io.to(workspaceId.toString()).emit("adminPromoted", { workspaceId, userId, workspace: populated });
+
+  res.status(200).json(populated);
+});
+
+export const demoteFromAdmin = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const { workspaceId, userId } = req.params;
+  const requesterId = req.user?._id;
+
+  const workspace = await Workspace.findById(workspaceId);
+  if (!workspace) return next(new AppError("Group not found", 404));
+
+  if (workspace.owner.toString() !== requesterId.toString()) {
+    return next(new AppError("Only the owner can demote admins", 403));
+  }
+
+  workspace.admins = workspace.admins.filter(adminId => adminId.toString() !== userId);
+  await workspace.save();
+
+  const populated = await Workspace.findById(workspaceId).populate("members", "fullName email profilePic status");
+  io.to(workspaceId.toString()).emit("adminDemoted", { workspaceId, userId, workspace: populated });
+
+  res.status(200).json(populated);
 });
 
 export const createChannel = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
