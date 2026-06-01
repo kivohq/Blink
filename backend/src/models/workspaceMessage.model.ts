@@ -24,6 +24,7 @@ const workspaceMessageSchema = new Schema<IWorkspaceMessageDocument>(
     text: {
       type: String,
       default: "",
+      maxlength: 1024,
     },
     image: {
       type: String,

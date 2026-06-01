@@ -18,6 +18,7 @@ const messageSchema = new Schema<IMessageDocument>(
     },
     text: {
       type: String,
+      maxlength: 1024,
     },
     image: {
       type: String,

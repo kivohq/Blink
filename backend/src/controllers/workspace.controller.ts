@@ -232,6 +232,10 @@ export const sendChannelMessage = catchAsync(async (req: AuthRequest, res: Respo
   const { text, image, replyTo } = req.body;
   const senderId = req.user?._id;
 
+  if (text && text.length > 1024) {
+    return next(new AppError("Message must be 1024 characters or less", 400));
+  }
+
   let imageUrl = "";
   if (image) {
     const uploadResponse = await cloudinary.uploader.upload(image);

@@ -143,6 +143,7 @@ const MessageInput = () => {
 
   const handleTextChange = (e) => {
     const newText = e.target.value;
+    if (newText.length > 1024) return;
     setText(newText);
     
     const lastWord = newText.split(" ").pop();
@@ -300,6 +301,7 @@ const MessageInput = () => {
               <textarea
                 ref={inputRef}
                 rows={1}
+                maxLength={1024}
                 className="flex-1 max-h-[150px] resize-none bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-[15px] text-slate-900 dark:text-slate-100 placeholder-slate-400 leading-[1.6] py-2 pr-2"
                 placeholder={editingMessageId ? "Edit message..." : "Type a message..."}
                 value={text}

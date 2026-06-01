@@ -34,10 +34,15 @@ import { formatMessageTime, getUserHandle } from "../lib/utils";
   }, [getUsers, fetchFriends, fetchRequests]);
 
   const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchInput(query);
-    searchUsers(query);
+    setSearchInput(e.target.value);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchUsers(searchInput);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput, searchUsers]);
 
   useEffect(() => {
     const onKeyDown = (e) => {

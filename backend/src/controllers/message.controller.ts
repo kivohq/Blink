@@ -233,6 +233,10 @@ export const sendMessage = [
       const { id: receiverId } = req.params;
       const senderId = req.user._id;
 
+      if (text && text.length > 1024) {
+        return res.status(400).json({ error: "Message must be 1024 characters or less" });
+      }
+
       // Check if users are friends (unless they are messaging themselves or one is the Help Center)
       if (senderId.toString() !== receiverId.toString()) {
         const helpCenterEmail = process.env.HELP_CENTER_EMAIL || "pansiluco@gmail.com";
@@ -486,6 +490,10 @@ export const editMessage = async (req: AuthRequest, res: Response): Promise<any>
     const { messageId } = req.params;
     const { text } = req.body;
     const userId = req.user._id;
+
+    if (text && text.length > 1024) {
+      return res.status(400).json({ error: "Message must be 1024 characters or less" });
+    }
 
     const message = await Message.findById(messageId);
     if (!message) {

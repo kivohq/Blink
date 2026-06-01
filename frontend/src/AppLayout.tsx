@@ -8,12 +8,14 @@ import UsersPanel from "./components/UsersPanel";
 import NotificationPanel from "./components/NotificationPanel";
 import SettingsPage from "./pages/SettingsPage";
 import { useChatStore } from "./store/useChatStore";
+import { useErrorStore } from "./store/useErrorStore";
 import { useParams, useNavigate } from "react-router-dom";
 import UserProfileModal from "./components/UserProfileModal";
 import { getUserHandle } from "./lib/utils";
 
 const AppLayout = () => {
-  const { selectedUser, setSelectedUser, users } = useChatStore();
+  const { selectedUser, setSelectedUser, users, isUsersLoading } = useChatStore();
+  const { handleError } = useErrorStore();
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem("lastActiveTab") || "chats";
   });
@@ -27,7 +29,7 @@ const AppLayout = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    if (username && users.length > 0) {
+    if (username && !isUsersLoading && users.length > 0) {
       const foundUser = users.find((u) => {
         const handle = getUserHandle(u).replace("@", "");
         return handle.toLowerCase() === username.toLowerCase();
@@ -35,9 +37,12 @@ const AppLayout = () => {
       if (foundUser) {
         setSelectedUser(foundUser);
         setViewProfileUser(foundUser);
+      } else {
+        handleError("User not found", `No user found with handle @${username}`);
+        navigate("/", { replace: true });
       }
     }
-  }, [username, users, setSelectedUser]);
+  }, [username, users, isUsersLoading, setSelectedUser, handleError, navigate]);
 
   const renderSideContent = () => {
     switch (activeTab) {
