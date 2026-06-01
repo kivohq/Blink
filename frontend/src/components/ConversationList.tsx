@@ -134,7 +134,7 @@ import { formatMessageTime, getUserHandle } from "../lib/utils";
             <span className="text-[12px] text-slate-400 font-medium">Group</span>
           </div>
           <p className="text-[14px] text-slate-500 truncate">
-            {workspace.description || "WhatsApp-style group chat"}
+            {workspace.description || ""}
           </p>
         </div>
 
