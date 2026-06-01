@@ -4,6 +4,7 @@ import { axiosInstance } from "../lib/axios.js";
 import { useAuthStore } from "./useAuthStore.js";
 import { useErrorStore } from "./useErrorStore.js";
 import { IMessage, IUser, IWorkspace } from "../types/index.js";
+import { encryptMessage } from "../lib/crypto.js";
 
 interface ChatState {
   messages: IMessage[];
@@ -36,8 +37,9 @@ interface ChatState {
   workspacePolls: Record<string, any[]>;
   workspaceResources: Record<string, any[]>;
   channelTypingUsers: string[];
+  groupKeys: Record<string, CryptoKey>;
 
-  setDraft: (userId: string, text: string) => void;
+  setGroupKey: (groupId: string, key: CryptoKey) => void;
   getUsers: () => Promise<void>;
   searchUsers: (query: string) => Promise<void>;
   getMessages: (userId: string, isLoadMore?: boolean) => Promise<void>;
