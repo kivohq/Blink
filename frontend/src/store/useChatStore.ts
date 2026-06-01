@@ -845,9 +845,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
         });
       }
       set({ workspaces });
-      if (workspaces.length > 0) {
-        get().setSelectedWorkspace(workspaces[0]);
-      }
     } catch (e) {
       console.error("Failed to load workspaces:", e);
       toast.error("Failed to sync workspaces.");

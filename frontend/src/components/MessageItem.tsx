@@ -8,6 +8,8 @@ import MessageReactions from "./MessageReactions";
 import QuotedMessage from "./QuotedMessage";
 import ViewOnceMedia from "./ViewOnceMedia";
 import LinkPreview from "./LinkPreview";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const MessageItem = ({ 
   message, 
