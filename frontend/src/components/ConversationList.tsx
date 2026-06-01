@@ -47,6 +47,20 @@ import { formatMessageTime, getUserHandle } from "../lib/utils";
     return () => clearTimeout(timer);
   }, [searchInput, searchUsers]);
 
+  const isRelated = (userId) => {
+    if (!userId) return false;
+    const uid = String(userId);
+    const isFriend = friends.some(f => String(f._id) === uid);
+    if (isFriend) return true;
+    const hasIncoming = requests.some(r => r.requesterId && String(r.requesterId._id) === uid);
+    if (hasIncoming) return true;
+    const hasOutgoing = sentRequests.some(r => r.receiverId && String(r.receiverId._id) === uid);
+    if (hasOutgoing) return true;
+    return false;
+  };
+
+  const frequentUsers = friends.slice(0, 5);
+
   // Combined list of users and workspaces
   const combinedList = [
     ...users.map(u => ({ ...u, type: 'user' })),
