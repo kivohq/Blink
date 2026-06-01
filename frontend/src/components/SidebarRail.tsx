@@ -161,37 +161,7 @@ const SidebarRail = ({ activeTab = "chats", setActiveTab = () => {}, forceShow =
 
           <div className="w-8 h-[2px] bg-slate-800 rounded-full" />
 
-          <div className="flex flex-col gap-3 w-full items-center overflow-y-auto max-h-[calc(100vh-420px)] scrollbar-none">
-            {workspaces.map((ws) => {
-              const isActive = selectedWorkspace?._id === ws._id;
-              return (
-                <button
-                  key={ws._id}
-                  onClick={() => setSelectedWorkspace(ws)}
-                  className="relative group flex items-center justify-center w-full focus:outline-none"
-                >
-                  <span
-                    className={`absolute left-0 w-1 bg-white rounded-r-md transition-all duration-300 ${
-                      isActive ? "h-8" : "h-0 group-hover:h-3"
-                    }`}
-                  />
-                  <div
-                    style={{ background: ws.icon || "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)" }}
-                    className={`size-12 flex items-center justify-center font-bold text-white text-sm shadow-md transition-all duration-300 ${
-                      isActive
-                        ? "rounded-xl"
-                        : "rounded-2xl hover:rounded-xl"
-                    }`}
-                  >
-                    {getWorkspaceInitials(ws.name)}
-                  </div>
-                  <span className="absolute left-[70px] px-3 py-1.5 bg-slate-950 text-white text-xs font-semibold rounded-lg shadow-xl border border-slate-800 opacity-0 scale-95 origin-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 whitespace-nowrap z-50">
-                    {ws.name}
-                  </span>
-                </button>
-              );
-            })}
-
+          <div className="flex flex-col gap-3 w-full items-center">
             <button
               onClick={() => setShowCreateModal(true)}
               className="relative group flex items-center justify-center w-full focus:outline-none"
@@ -200,7 +170,7 @@ const SidebarRail = ({ activeTab = "chats", setActiveTab = () => {}, forceShow =
                 <Plus className="w-5 h-5" />
               </div>
               <span className="absolute left-[70px] px-3 py-1.5 bg-slate-950 text-white text-xs font-semibold rounded-lg shadow-xl border border-slate-800 opacity-0 scale-95 origin-left pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 whitespace-nowrap z-50">
-                Add a Server
+                Create a Group
               </span>
             </button>
           </div>
@@ -248,15 +218,15 @@ const SidebarRail = ({ activeTab = "chats", setActiveTab = () => {}, forceShow =
             role="dialog"
             aria-modal="true"
           >
-            <h2 className="text-xl font-bold text-slate-100 mb-2">Create Your Server</h2>
+            <h2 className="text-xl font-bold text-slate-100 mb-2">Create Your Group</h2>
             <p className="text-slate-400 text-sm mb-6">
-              Your server is where you and your team communicate. Customize it with a name and a vibrant theme.
+              Your group is where you and your team communicate. Customize it with a name and a vibrant theme.
             </p>
 
             <form onSubmit={handleCreateServer} className="space-y-6">
               <div className="space-y-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Server Name
+                  Group Name
                 </label>
                 <input
                   type="text"
@@ -271,7 +241,7 @@ const SidebarRail = ({ activeTab = "chats", setActiveTab = () => {}, forceShow =
 
               <div className="space-y-3">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Server Theme Gradient
+                  Group Theme Gradient
                 </label>
                 <div className="flex gap-3 flex-wrap">
                   {gradients.map((grad) => (
@@ -307,7 +277,7 @@ const SidebarRail = ({ activeTab = "chats", setActiveTab = () => {}, forceShow =
                   type="submit"
                   className="px-5 py-2.5 bg-primary hover:bg-primary-dark active:opacity-90 text-white text-sm font-semibold rounded-xl shadow-lg shadow-primary/20 transition"
                 >
-                  Create Server
+                  Create Group
                 </button>
               </div>
             </form>

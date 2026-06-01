@@ -55,7 +55,7 @@ const App: React.FC = () => {
   }, [checkAuth]);
 
   const { fetchFriends, fetchRequests, subscribeToFriendEvents, unsubscribeFromFriendEvents } = useFriendStore();
-  const { subscribeToMessages, unsubscribeFromMessages } = useChatStore();
+  const { subscribeToMessages, unsubscribeFromMessages, initWorkspaces } = useChatStore();
 
   useEffect(() => {
     if (authUser && socket) {
@@ -63,12 +63,13 @@ const App: React.FC = () => {
       fetchRequests();
       subscribeToFriendEvents();
       subscribeToMessages();
+      initWorkspaces();
       return () => {
         unsubscribeFromFriendEvents();
         unsubscribeFromMessages();
       };
     }
-  }, [authUser, socket, fetchFriends, fetchRequests, subscribeToFriendEvents, unsubscribeFromFriendEvents, subscribeToMessages, unsubscribeFromMessages]);
+  }, [authUser, socket, fetchFriends, fetchRequests, subscribeToFriendEvents, unsubscribeFromFriendEvents, subscribeToMessages, unsubscribeFromMessages, initWorkspaces]);
 
   useEffect(() => {
     const root = document.documentElement;

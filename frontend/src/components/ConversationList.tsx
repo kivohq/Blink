@@ -8,7 +8,7 @@ import FrequentContacts from "./FrequentContacts";
 import { Avatar } from "./ui/BlinkComponents";
 import { Button } from "./ui";
 import Input from "./ui/Input";
-import { Search, Edit3, Zap, MoreHorizontal, CheckCircle2, MessageSquare } from "lucide-react";
+import { Search, Edit3, Zap, MoreHorizontal, CheckCircle2, MessageSquare, Plus, Users } from "lucide-react";
 import { formatMessageTime, getUserHandle } from "../lib/utils";
 
   const ConversationList = () => {
@@ -20,6 +20,9 @@ import { formatMessageTime, getUserHandle } from "../lib/utils";
     isUsersLoading,
     searchUsers,
     searchResults,
+    workspaces,
+    selectedWorkspace,
+    setSelectedWorkspace,
   } = useChatStore();
 
   const { friends, requests, sentRequests, fetchFriends, fetchRequests } = useFriendStore();
@@ -44,76 +47,89 @@ import { formatMessageTime, getUserHandle } from "../lib/utils";
     return () => clearTimeout(timer);
   }, [searchInput, searchUsers]);
 
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      const key = (e.key || '').toLowerCase();
-      if ((e.ctrlKey || e.metaKey) && key === 'k') {
-        e.preventDefault();
-        searchRef.current?.focus();
-      }
+  // Combined list of users and workspaces
+  const combinedList = [
+    ...users.map(u => ({ ...u, type: 'user' })),
+    ...workspaces.map(w => ({ ...w, type: 'workspace' }))
+  ];
 
-      if (e.altKey && (key === 'arrowup' || key === 'arrowdown')) {
-        e.preventDefault();
-        const displayUsers = searchInput ? searchResults : users;
-        const baseList = displayUsers
-          .filter((user) => searchInput || user.lastMessage || isRelated(user._id))
-          .sort((a, b) => {
-            const aTime = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
-            const bTime = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
-            return bTime - aTime;
-          });
+  const displayList = searchInput 
+    ? searchResults.map(u => ({ ...u, type: 'user' })) 
+    : combinedList;
 
-        const sortedUsers = [
-          ...baseList.filter((user) => authUser?.pinnedChats?.includes(user._id)),
-          ...baseList.filter((user) => !authUser?.pinnedChats?.includes(user._id))
-        ];
-
-        if (sortedUsers.length === 0) return;
-
-        const currentIndex = sortedUsers.findIndex(u => u._id === selectedUser?._id);
-        let nextIndex;
-
-        if (key === 'arrowup') {
-          nextIndex = currentIndex <= 0 ? sortedUsers.length - 1 : currentIndex - 1;
-        } else {
-          nextIndex = currentIndex === -1 || currentIndex === sortedUsers.length - 1 ? 0 : currentIndex + 1;
-        }
-
-        setSelectedUser(sortedUsers[nextIndex]);
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [searchInput, searchResults, users, selectedUser, setSelectedUser, authUser, friends, requests, sentRequests]);
-
-  const isRelated = (userId) => {
-    if (!userId) return false;
-    const uid = String(userId);
-    const isFriend = friends.some(f => String(f._id) === uid);
-    if (isFriend) return true;
-    const hasIncoming = requests.some(r => r.requesterId && String(r.requesterId._id) === uid);
-    if (hasIncoming) return true;
-    const hasOutgoing = sentRequests.some(r => r.receiverId && String(r.receiverId._id) === uid);
-    if (hasOutgoing) return true;
-    return false;
-  };
-
-  const displayUsers = searchInput ? searchResults : users;
-  
-  const baseList = displayUsers
-    .filter((user) => searchInput || user.lastMessage || isRelated(user._id))
+  const baseList = displayList
+    .filter((item) => {
+      if (item.type === 'workspace') return true;
+      return searchInput || item.lastMessage || isRelated(item._id);
+    })
     .sort((a, b) => {
       const aTime = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
       const bTime = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
       return bTime - aTime;
     });
 
-  const frequentUsers = friends.slice(0, 5);
+  const pinnedItems = baseList.filter((item) => {
+    if (item.type === 'workspace') return false; // Workspaces not pinnable yet in this logic
+    return authUser?.pinnedChats?.includes(item._id);
+  });
   
-  const pinnedUsers = baseList.filter((user) => authUser?.pinnedChats?.includes(user._id));
-  const unpinnedUsers = baseList.filter((user) => !authUser?.pinnedChats?.includes(user._id));
+  const unpinnedItems = baseList.filter((item) => {
+    if (item.type === 'workspace') return true;
+    return !authUser?.pinnedChats?.includes(item._id);
+  });
 
-  if (isUsersLoading) return <SidebarSkeleton />;
+  const renderItem = (item) => {
+    if (item.type === 'workspace') return renderWorkspaceItem(item);
+    return renderUserItem(item);
+  };
+
+  const renderWorkspaceItem = (workspace) => {
+    const isSelected = selectedWorkspace?._id === workspace._id;
+    const initials = workspace.name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+
+    return (
+      <button
+        key={workspace._id}
+        onClick={() => {
+          setSelectedUser(null);
+          setSelectedWorkspace(workspace);
+        }}
+        className={`w-full flex items-center gap-4 px-5 py-4 transition-all duration-200 border-b border-slate-50 dark:border-slate-800/50 relative overflow-hidden group ${
+          isSelected 
+            ? "bg-slate-50 dark:bg-slate-800/50" 
+            : "hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+        }`}
+      >
+        <div className="relative flex-shrink-0">
+          <div 
+            style={{ background: workspace.icon || "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)" }}
+            className="size-12 rounded-2xl flex items-center justify-center font-bold text-white text-sm shadow-md"
+          >
+            {initials}
+          </div>
+          <div className="absolute -bottom-1 -right-1 size-5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] text-white">
+            <Users size={10} />
+          </div>
+        </div>
+
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex justify-between items-center mb-1">
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100 truncate text-[16px]">
+              {workspace.name}
+            </h3>
+            <span className="text-[12px] text-slate-400 font-medium">Group</span>
+          </div>
+          <p className="text-[14px] text-slate-500 truncate">
+            {workspace.description || "WhatsApp-style group chat"}
+          </p>
+        </div>
+
+        {isSelected && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-primary rounded-r-full" />
+        )}
+      </button>
+    );
+  };
 
   const renderUserItem = (user) => {
     const isOnline = onlineUsers.includes(user._id);
@@ -193,13 +209,17 @@ import { formatMessageTime, getUserHandle } from "../lib/utils";
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => window.dispatchEvent(new CustomEvent("sidebar-create-server"))}
+              className="p-2 text-slate-500 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+              title="Create Group"
+            >
+              <Plus size={22} />
+            </button>
+            <button
               onClick={() => searchRef.current?.focus()}
               className="p-2 text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
             >
               <Search size={22} />
-            </button>
-            <button className="p-2 text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">
-              <Edit3 size={22} />
             </button>
           </div>
         </div>
@@ -225,18 +245,18 @@ import { formatMessageTime, getUserHandle } from "../lib/utils";
         )}
 
         <div className="pb-20">
-          {pinnedUsers.length === 0 && unpinnedUsers.length === 0 ? (
+          {pinnedItems.length === 0 && unpinnedItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 px-10 text-center">
               <div className="size-16 rounded-3xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4">
                 <MessageSquare className="size-8 text-slate-300" />
               </div>
               <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-1">No chats yet</h3>
-              <p className="text-slate-400 text-sm">Start a conversation with your friends!</p>
+              <p className="text-slate-400 text-sm">Start a conversation with your friends or groups!</p>
             </div>
           ) : (
             <>
-              {pinnedUsers.map(renderUserItem)}
-              {unpinnedUsers.map(renderUserItem)}
+              {pinnedItems.map(renderItem)}
+              {unpinnedItems.map(renderItem)}
             </>
           )}
         </div>

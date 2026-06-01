@@ -135,7 +135,7 @@ const WorkspaceChat = ({ onBurgerClick }) => {
     return (
       <div className="flex-grow flex flex-col items-center justify-center bg-slate-950 text-slate-400">
         <Loader className="w-8 h-8 animate-spin text-blue-500 mb-2" />
-        <span>Loading Channel...</span>
+        <span>Loading Group...</span>
       </div>
     );
   }
@@ -484,7 +484,7 @@ const WorkspaceChat = ({ onBurgerClick }) => {
 
                 <input
                   type="text"
-                  placeholder={`Message #${channel.name}`}
+                  placeholder="Type a message..."
                   value={text}
                   maxLength={1024}
                   onChange={(e) => setText(e.target.value)}

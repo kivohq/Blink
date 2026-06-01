@@ -53,14 +53,14 @@ const WorkspaceSidebar = () => {
 
   return (
     <aside className="w-64 h-full bg-slate-55 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 flex-shrink-0 select-none transition-colors duration-200">
-      {/* Workspace Header Dropdown */}
+      {/* Group Header */}
       <div className="h-16 px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between hover:bg-slate-200/50 dark:hover:bg-slate-800/40 cursor-pointer transition">
         <div className="flex flex-col">
           <span className="font-bold text-slate-800 dark:text-slate-100 text-sm truncate max-w-[180px]">
             {selectedWorkspace.name}
           </span>
           <span className="text-[10px] text-slate-550 dark:text-slate-400 font-medium truncate max-w-[180px]">
-            {selectedWorkspace.description || "Workspace Server"}
+            {selectedWorkspace.description || "Group Info"}
           </span>
         </div>
         <ChevronDown className="w-4 h-4 text-slate-500 dark:text-slate-400" />
@@ -68,39 +68,41 @@ const WorkspaceSidebar = () => {
 
       {/* Main List */}
       <div className="flex-1 overflow-y-auto px-2 py-4 space-y-6 scrollbar-thin">
-        {/* Channels Section */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between px-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            <span>Channels</span>
-            <button
-              onClick={() => setShowCreateChannelModal(true)}
-              className="hover:text-slate-900 dark:hover:text-slate-100 transition p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-850"
-              title="Create Channel"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
+        {/* Only show Channels if there's more than one, otherwise it's just a group chat */}
+        {selectedWorkspace.channels.length > 1 && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between px-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <span>Topics</span>
+              <button
+                onClick={() => setShowCreateChannelModal(true)}
+                className="hover:text-slate-900 dark:hover:text-slate-100 transition p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-850"
+                title="Add Topic"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
-          <div className="space-y-0.5">
-            {selectedWorkspace.channels.map((chan) => {
-              const isActive = selectedChannelId === chan._id;
-              return (
-                <button
-                  key={chan._id}
-                  onClick={() => setSelectedChannelId(chan._id)}
-                  className={`w-full flex items-center px-2 py-2 rounded-lg text-sm font-semibold transition duration-150 ${
-                    isActive
-                      ? "bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-                      : "text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:dark:text-slate-200 hover:bg-slate-200/50 hover:dark:bg-slate-800/50"
-                  }`}
-                >
-                  {getChannelIcon(chan.type)}
-                  <span className="truncate">{chan.name}</span>
-                </button>
-              );
-            })}
+            <div className="space-y-0.5">
+              {selectedWorkspace.channels.map((chan) => {
+                const isActive = selectedChannelId === chan._id;
+                return (
+                  <button
+                    key={chan._id}
+                    onClick={() => setSelectedChannelId(chan._id)}
+                    className={`w-full flex items-center px-2 py-2 rounded-lg text-sm font-semibold transition duration-150 ${
+                      isActive
+                        ? "bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:dark:text-slate-200 hover:bg-slate-200/50 hover:dark:bg-slate-800/50"
+                    }`}
+                  >
+                    {getChannelIcon(chan.type)}
+                    <span className="truncate">{chan.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Members Roster Section */}
         <div className="space-y-2">
@@ -175,16 +177,16 @@ const WorkspaceSidebar = () => {
             role="dialog"
             aria-modal="true"
           >
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Create Channel</h2>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Create Topic</h2>
             <p className="text-slate-500 dark:text-slate-400 text-xs mb-5">
-              Configure a dedicated channel for focused group chats, real-time polls, or resource galleries.
+              Configure a dedicated topic for focused group chats, real-time polls, or resource galleries.
             </p>
 
             <form onSubmit={handleCreateChannel} className="space-y-4">
               {/* Channel Name input */}
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Channel Name
+                  Topic Name
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 font-semibold">#</span>
@@ -203,7 +205,7 @@ const WorkspaceSidebar = () => {
               {/* Channel Type */}
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Channel Type
+                  Topic Type
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -254,4 +256,3 @@ const WorkspaceSidebar = () => {
 };
 
 export default WorkspaceSidebar;
-

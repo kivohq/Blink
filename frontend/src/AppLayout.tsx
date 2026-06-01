@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import SidebarRail from "./components/SidebarRail";
+import WorkspaceSidebar from "./components/WorkspaceSidebar";
 import ConversationList from "./components/ConversationList";
 import ChatContainer from "./components/ChatContainer";
+import WorkspaceChat from "./components/WorkspaceChat";
 import NoChatSelected from "./components/NoChatSelected";
 import MobileBottomNav from "./components/MobileBottomNav";
 import UsersPanel from "./components/UsersPanel";
@@ -14,7 +16,7 @@ import UserProfileModal from "./components/UserProfileModal";
 import { getUserHandle } from "./lib/utils";
 
 const AppLayout = () => {
-  const { selectedUser, setSelectedUser, users, isUsersLoading } = useChatStore();
+  const { selectedUser, setSelectedUser, selectedWorkspace, setSelectedWorkspace, users, isUsersLoading } = useChatStore();
   const { handleError } = useErrorStore();
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem("lastActiveTab") || "chats";
@@ -45,6 +47,7 @@ const AppLayout = () => {
   }, [username, users, isUsersLoading, setSelectedUser, handleError, navigate]);
 
   const renderSideContent = () => {
+    if (selectedWorkspace) return <WorkspaceSidebar />;
     switch (activeTab) {
       case "users": return <UsersPanel />;
       case "notifications": return <NotificationPanel />;
@@ -60,11 +63,11 @@ const AppLayout = () => {
         <SidebarRail activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
       
-      {/* 2. Side Column (Conversations, Users, etc.) */}
+      {/* 2. Side Column (Conversations, Users, Groups, etc.) */}
       <div className={`
         w-full md:w-[380px] flex-shrink-0 border-r border-border dark:border-border-dark flex flex-col h-full 
         bg-white dark:bg-surface-dark transition-all duration-300 ease-in-out
-        ${selectedUser ? "hidden md:flex" : "flex"} 
+        ${(selectedUser || selectedWorkspace) ? "hidden md:flex" : "flex"} 
         ${activeTab !== 'chats' ? 'pb-16 md:pb-0' : 'pb-16 md:pb-0'}
       `}>
         {renderSideContent()}
@@ -74,9 +77,15 @@ const AppLayout = () => {
       <main className={`
         flex-1 flex flex-col h-full relative overflow-hidden 
         bg-slate-50 dark:bg-background-dark transition-all duration-300
-        ${selectedUser ? "flex" : "hidden md:flex"}
+        ${(selectedUser || selectedWorkspace) ? "flex" : "hidden md:flex"}
       `}>
-        {selectedUser ? <ChatContainer /> : <NoChatSelected />}
+        {selectedWorkspace ? (
+          <WorkspaceChat onBurgerClick={() => setSelectedWorkspace(null)} />
+        ) : selectedUser ? (
+          <ChatContainer />
+        ) : (
+          <NoChatSelected />
+        )}
       </main>
 
       {/* 4. Mobile Bottom Navigation */}
