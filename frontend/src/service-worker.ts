@@ -40,15 +40,18 @@ swSelf.addEventListener('push', (event: any) => {
   try {
     data = event.data ? event.data.json() : {};
   } catch (e) {
-    data = { title: 'Blink', body: event.data ? event.data.text() : 'New message' };
+    data = { title: 'Blink', body: event.data ? event.data.text() : 'New message', senderId: 'unknown' };
   }
   
   const title = data.title || 'Blink';
+  const senderId = data.senderId || 'unknown';
+  const tag = `blink-msg-${senderId}`; // Batching by senderId
+  
   const options = {
     body: data.body || 'New message in Blink',
     icon: '/icon-512.png',
     badge: '/icon-192.png',
-    tag: 'blink-msg',
+    tag: tag,
     renotify: true,
     data: {
       url: data.url || '/',

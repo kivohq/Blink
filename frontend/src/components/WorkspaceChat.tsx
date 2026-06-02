@@ -1,3 +1,4 @@
+import PinnedMessagesPanel from "./PinnedMessagesPanel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
@@ -272,6 +273,7 @@ const WorkspaceChat = ({ onBurgerClick }) => {
       case "announcements":
         return (
           <div className="flex-1 flex flex-col overflow-hidden">
+            <PinnedMessagesPanel channelId={selectedChannelId} />
             {/* Message Stream */}
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 chat-bg-pattern scrollbar-thin">
               {messages.length === 0 ? (

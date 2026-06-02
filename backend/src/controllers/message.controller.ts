@@ -650,12 +650,14 @@ export const getPinnedMessages = async (req: AuthRequest, res: Response): Promis
 export const searchMessages = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
     const { userId } = req.params;
-    const { query, sender } = req.query as { query?: string; sender?: string };
+    const { query, sender, startDate, endDate, fileType } = req.query as { 
+      query?: string; 
+      sender?: string;
+      startDate?: string;
+      endDate?: string;
+      fileType?: string;
+    };
     const myId = req.user._id;
-
-    if (!query || query.trim() === "") {
-      return res.status(200).json([]);
-    }
 
     const filterObj: any = {
       $or: [
@@ -664,11 +666,24 @@ export const searchMessages = async (req: AuthRequest, res: Response): Promise<a
       ],
       isDeleted: false,
       isExpired: { $ne: true },
-      text: { $regex: query, $options: "i" },
     };
+
+    if (query) {
+      filterObj.text = { $regex: query, $options: "i" };
+    }
 
     if (sender) {
       filterObj.senderId = sender === "me" ? myId : (userId as string);
+    }
+
+    if (startDate || endDate) {
+      filterObj.createdAt = {};
+      if (startDate) filterObj.createdAt.$gte = new Date(startDate);
+      if (endDate) filterObj.createdAt.$lte = new Date(endDate);
+    }
+
+    if (fileType) {
+      filterObj["file.type"] = { $regex: fileType, $options: "i" };
     }
 
     const results = await Message.find(filterObj)

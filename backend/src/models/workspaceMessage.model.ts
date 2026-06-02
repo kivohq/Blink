@@ -54,6 +54,27 @@ const workspaceMessageSchema = new Schema<IWorkspaceMessageDocument>(
       ref: "WorkspaceMessage",
       default: null,
     },
+    threadId: {
+      type: Schema.Types.ObjectId,
+      ref: "WorkspaceMessage",
+      default: null,
+    },
+    threadReplyCount: {
+      type: Number,
+      default: 0,
+    },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
+    pinnedAt: {
+      type: Date,
+      default: null,
+    },
+    pinnedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     expiresAt: {
       type: Date,
       default: null,

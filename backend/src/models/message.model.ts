@@ -76,6 +76,15 @@ const messageSchema = new Schema<IMessageDocument>(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    threadId: {
+      type: Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
+    threadReplyCount: {
+      type: Number,
+      default: 0,
+    },
     replyTo: {
       type: Schema.Types.ObjectId,
       ref: "Message",

@@ -63,6 +63,8 @@ export interface IMessage {
   isPinned: boolean;
   pinnedAt?: Date;
   pinnedBy?: string | Types.ObjectId;
+  threadId?: string | Types.ObjectId | null;
+  threadReplyCount?: number;
   isExpired?: boolean;
   expiresAt?: Date;
   viewOnce: boolean;
@@ -162,6 +164,8 @@ export interface IWorkspaceMessage {
   isEdited: boolean;
   editedAt?: Date;
   replyTo?: string | Types.ObjectId | IWorkspaceMessage;
+  threadId?: string | Types.ObjectId | null;
+  threadReplyCount?: number;
   expiresAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;

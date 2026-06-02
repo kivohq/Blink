@@ -12,6 +12,7 @@ export const useThemeStore = create<ThemeState>((set) => ({
   theme: localStorage.getItem("chat-theme") || DEFAULT_THEME,
   setTheme: (theme) => {
     localStorage.setItem("chat-theme", theme);
+    document.documentElement.className = theme;
     set({ theme });
   },
   toggleTheme: () => {
@@ -19,10 +20,15 @@ export const useThemeStore = create<ThemeState>((set) => ({
       let nextTheme: string;
       if (state.theme === "system") {
         nextTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark";
+      } else if (state.theme === "light") {
+        nextTheme = "dark";
+      } else if (state.theme === "dark") {
+        nextTheme = "high-contrast";
       } else {
-        nextTheme = state.theme === "dark" ? "light" : "dark";
+        nextTheme = "light";
       }
       localStorage.setItem("chat-theme", nextTheme);
+      document.documentElement.className = nextTheme;
       return { theme: nextTheme };
     });
   },

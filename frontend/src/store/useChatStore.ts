@@ -113,7 +113,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   })(),
   lockedChats: [],
-  drafts: {},
+  drafts: (() => {
+    try {
+      const raw = localStorage.getItem('chat-drafts');
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  })(),
   isMoreMessagesAvailable: true,
   isCommandPaletteOpen: false,
   pendingAttachment: null,
@@ -128,11 +135,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
   channelTypingUsers: [],
 
   setDraft: (userId, text) => {
+    const newDrafts = {
+      ...get().drafts,
+      [userId]: text,
+    };
+    localStorage.setItem('chat-drafts', JSON.stringify(newDrafts));
     set({
-      drafts: {
-        ...get().drafts,
-        [userId]: text,
-      },
+      drafts: newDrafts,
     });
   },
 
@@ -412,10 +421,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  searchMessages: async (userId, query, sender) => {
+  searchMessages: async (userId, query, sender, filters = {}) => {
     try {
-      const params = new URLSearchParams({ query });
+      const params = new URLSearchParams();
+      if (query) params.append("query", query);
       if (sender) params.append("sender", sender);
+      if (filters.startDate) params.append("startDate", filters.startDate);
+      if (filters.endDate) params.append("endDate", filters.endDate);
+      if (filters.fileType) params.append("fileType", filters.fileType);
+
       const res = await axiosInstance.get(`/messages/search/${userId}?${params}`);
       set({ searchMessageResults: res.data });
     } catch (error: any) {

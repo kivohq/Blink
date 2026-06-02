@@ -9,31 +9,43 @@ export default {
           DEFAULT: '#00D4FF',
           dark: '#0080FF',
           foreground: '#ffffff',
+          'high-contrast': '#FFFF00', // Highly visible against dark backgrounds
         },
         surface: {
           DEFAULT: '#ffffff',
-          dark: '#0f172a',
+          dark: '#020617',
+          'high-contrast': '#000000',
         },
         background: {
           DEFAULT: '#ffffff',
           dark: '#020617',
+          'high-contrast': '#000000',
         },
         border: {
           DEFAULT: '#f1f5f9',
           dark: '#1e293b',
+          'high-contrast': '#FFFFFF',
         },
         success: {
           DEFAULT: '#00FF88',
           foreground: '#ffffff',
+          'high-contrast': '#00FF00',
         },
         warning: {
           DEFAULT: '#f59e0b',
           foreground: '#ffffff',
+          'high-contrast': '#FFFF00',
         },
         danger: {
           DEFAULT: '#ef4444',
           foreground: '#ffffff',
+          'high-contrast': '#FF0000',
         },
+        text: {
+          DEFAULT: '#0f172a',
+          dark: '#f1f5f9',
+          'high-contrast': '#FFFFFF',
+        }
       },
       borderRadius: {
         'xl': '1rem',

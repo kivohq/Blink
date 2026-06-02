@@ -12,6 +12,9 @@ import {
   sendChannelMessage,
   addMessageReaction,
   removeMessageReaction,
+  togglePinWorkspaceMessage,
+  getThreadMessages,
+  replyInThread,
   getPolls,
   createPoll,
   voteInPoll,
@@ -32,6 +35,9 @@ router.post("/:workspaceId/join", protectRoute, joinWorkspace);
 
 router.get("/:workspaceId/messages/:channelId", protectRoute, getChannelMessages);
 router.post("/:workspaceId/messages/:channelId", protectRoute, workspaceUpload, sendChannelMessage);
+router.patch("/messages/:messageId/pin", protectRoute, togglePinWorkspaceMessage);
+router.get("/messages/:messageId/thread", protectRoute, getThreadMessages);
+router.post("/messages/:messageId/thread", protectRoute, workspaceUpload, replyInThread);
 router.post("/messages/:messageId/reaction/add", protectRoute, addMessageReaction);
 router.post("/messages/:messageId/reaction/remove", protectRoute, removeMessageReaction);
 

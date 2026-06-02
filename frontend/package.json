@@ -14,12 +14,14 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
+    "dexie": "^4.4.3",
     "lucide-react": "^0.459.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^6.28.0",
+    "react-syntax-highlighter": "^16.1.1",
     "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.1",
     "zustand": "^5.0.1"
@@ -36,7 +38,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "cypress": "^15.16.0",
-    "eslint": "^9.13.0",
+    "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",

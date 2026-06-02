@@ -30,6 +30,10 @@ const userSchema = new Schema<IUserDocument>(
       enum: ["online", "away", "dnd", "offline"],
       default: "offline",
     },
+    dnd: {
+      type: Boolean,
+      default: false,
+    },
     statusMessage: {
       type: String,
       default: "",

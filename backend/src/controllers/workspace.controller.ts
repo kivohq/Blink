@@ -11,6 +11,9 @@ import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 
+export { togglePinWorkspaceMessage } from "./workspace-pin.js";
+export { getThreadMessages, replyInThread } from "./workspace-thread.js";
+
 const storage = multer.memoryStorage();
 export const workspaceUpload = multer({
   storage,
