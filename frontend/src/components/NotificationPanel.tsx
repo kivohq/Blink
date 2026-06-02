@@ -21,7 +21,7 @@ const NotificationPanel = () => {
   }, [unreadOnly, getNotifications]);
 
   return (
-    <div className="flex flex-col h-full bg-surface dark:bg-surface-dark transition-colors duration-200 overflow-hidden">
+    <div className="flex flex-col h-full glass transition-colors duration-200 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-6 pb-4 flex-shrink-0 gap-3">
         <div>

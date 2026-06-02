@@ -15,7 +15,7 @@ const ChatHeader = ({ onSearchClick, onPinnedClick, onBurgerClick, onAvatarClick
   if (!selectedUser) return <div className="h-16 flex-shrink-0" />;
 
   return (
-    <div className="px-4 py-3 border-b border-slate-50 dark:border-slate-800/50 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-xl flex-shrink-0 z-20 select-none transition-all duration-300">
+    <div className="px-4 py-3 border-b border-slate-50 dark:border-slate-800/50 glass flex-shrink-0 z-20 select-none transition-all duration-300">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Back button — mobile only */}

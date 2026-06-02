@@ -66,7 +66,7 @@ const AppLayout = () => {
       {/* 2. Side Column (Conversations, Users, Groups, etc.) */}
       <div className={`
         w-full md:w-[380px] flex-shrink-0 border-r border-border dark:border-border-dark flex flex-col h-full 
-        bg-white dark:bg-surface-dark transition-all duration-300 ease-in-out
+        glass transition-all duration-300 ease-in-out
         ${(selectedUser || selectedWorkspace) ? "hidden md:flex" : "flex"} 
         ${activeTab !== 'chats' ? 'pb-16 md:pb-0' : 'pb-16 md:pb-0'}
       `}>
@@ -76,7 +76,7 @@ const AppLayout = () => {
       {/* 3. Main Content Area */}
       <main className={`
         flex-1 flex flex-col h-full relative overflow-hidden 
-        bg-slate-50 dark:bg-background-dark transition-all duration-300
+        glass transition-all duration-300
         ${(selectedUser || selectedWorkspace) ? "flex" : "hidden md:flex"}
       `}>
         {selectedWorkspace ? (

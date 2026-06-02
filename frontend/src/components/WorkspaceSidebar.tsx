@@ -58,7 +58,7 @@ const WorkspaceSidebar = () => {
   };
 
   return (
-    <aside className="w-64 h-full bg-slate-55 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 flex-shrink-0 select-none transition-colors duration-200">
+    <aside className="w-64 h-full glass border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 flex-shrink-0 select-none transition-colors duration-200">
       {/* Group Header */}
       <div className="h-16 px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between hover:bg-slate-200/50 dark:hover:bg-slate-800/40 cursor-pointer transition">
         <div className="flex flex-col">

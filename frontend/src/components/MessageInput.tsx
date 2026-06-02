@@ -235,7 +235,7 @@ const MessageInput = () => {
   }
 
   return (
-    <div className="w-full px-4 py-4 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-xl border-t border-slate-50 dark:border-slate-800/50 flex-shrink-0 z-20">
+    <div className="w-full px-4 py-4 bg-white/10 dark:bg-surface-dark/10 backdrop-blur-xl border-t border-slate-50 dark:border-slate-800/50 flex-shrink-0 z-20 glass">
       <div className="max-w-[800px] mx-auto relative">
         
         {emojiSuggestions.length > 0 && (

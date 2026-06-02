@@ -65,12 +65,12 @@ const MessageItem = ({
     ? "rounded-2xl rounded-tr-sm"
     : "rounded-2xl rounded-tl-sm";
 
-  const commonBubbleClasses = `relative flex flex-col select-text px-4 py-2.5 shadow-sm transition-all no-callout group/bubble ${bubbleRoundness} ${
+  const commonBubbleClasses = `relative bubble-tail flex flex-col select-text px-4 py-2.5 shadow-sm transition-all no-callout group/bubble ${bubbleRoundness} ${
     message.isDeleted
       ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 italic font-normal"
       : isSelf
-        ? "bg-gradient-to-br from-[#00D4FF] to-[#0080FF] text-white shadow-lg shadow-primary/20"
-        : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-50 dark:border-slate-700/50"
+        ? "bg-gradient-to-br from-[#00D4FF] to-[#0080FF] text-white shadow-lg shadow-primary/20 bubble-tail-self"
+        : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-50 dark:border-slate-700/50 bubble-tail-other"
   } hover:cursor-pointer`;
 
   const marginBottom = isNextSameSender ? "mb-1" : "mb-4";

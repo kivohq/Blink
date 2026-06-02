@@ -6,10 +6,10 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#00D4FF',
-          dark: '#0080FF',
+          DEFAULT: '#0D9488', // teal-600
+          dark: '#0F766E', // teal-700
           foreground: '#ffffff',
-          'high-contrast': '#FFFF00', // Highly visible against dark backgrounds
+          'high-contrast': '#00FF00', // high contrast green
         },
         surface: {
           DEFAULT: '#ffffff',
