@@ -1,3 +1,10 @@
+import { Response, NextFunction } from "express";
+import { AuthRequest } from "../middleware/auth.middleware.js";
+import catchAsync from "../utils/catchAsync.js";
+import AppError from "../utils/AppError.js";
+import WorkspaceMessage from "../models/workspaceMessage.model.js";
+import { io } from "../lib/socket.js";
+
 export const togglePinWorkspaceMessage = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { messageId } = req.params;
   const userId = req.user?._id;
@@ -6,8 +13,8 @@ export const togglePinWorkspaceMessage = catchAsync(async (req: AuthRequest, res
   if (!message) return next(new AppError("Message not found", 404));
 
   message.isPinned = !message.isPinned;
-  message.pinnedAt = message.isPinned ? new Date() : null;
-  message.pinnedBy = message.isPinned ? userId : null;
+  message.pinnedAt = message.isPinned ? new Date() : undefined;
+  message.pinnedBy = message.isPinned ? userId : undefined;
 
   await message.save();
 

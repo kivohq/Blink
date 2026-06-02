@@ -9,6 +9,7 @@ export interface IUser {
   pushSubscription?: any;
   chatSettings?: Map<string, any>;
   status?: 'online' | 'offline' | 'away' | 'busy';
+  dnd?: boolean;
   statusMessage?: string;
   lastSeen?: Date;
   blockedUsers?: (string | Types.ObjectId)[];
@@ -166,6 +167,10 @@ export interface IWorkspaceMessage {
   replyTo?: string | Types.ObjectId | IWorkspaceMessage;
   threadId?: string | Types.ObjectId | null;
   threadReplyCount?: number;
+  // Pinning fields
+  isPinned?: boolean;
+  pinnedAt?: Date;
+  pinnedBy?: string | Types.ObjectId;
   expiresAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
