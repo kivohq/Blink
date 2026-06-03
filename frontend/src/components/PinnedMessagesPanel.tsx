@@ -1,4 +1,4 @@
-import { useChatStore } from "../../store/useChatStore";
+import { useChatStore } from "../store/useChatStore";
 import { Pin } from "lucide-react";
 
 const PinnedMessagesPanel = ({ channelId }) => {
