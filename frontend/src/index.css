@@ -84,41 +84,12 @@
   @apply top-2;
 }
 
-/* ===== Bubble Tails ===== */
-.bubble-tail::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  width: 12px;
-  height: 12px;
-}
-
-.bubble-tail-self::after {
-  right: -6px;
-  background: radial-gradient(circle at bottom left, transparent 11px, #3b82f6 11px);
-}
-
-.dark .bubble-tail-self::after {
-  background: radial-gradient(circle at bottom left, transparent 11px, #2563eb 11px);
-}
-
-.high-contrast .bubble-tail-self::after {
-  background: radial-gradient(circle at bottom left, transparent 11px, #000000 11px);
-  border: 1px solid #FFFFFF;
-}
-
-.bubble-tail-other::after {
-  left: -6px;
-  background: radial-gradient(circle at bottom right, transparent 11px, #ffffff 11px);
-}
-
-.dark .bubble-tail-other::after {
-  background: radial-gradient(circle at bottom right, transparent 11px, #1e293b 11px);
-}
-
-.high-contrast .bubble-tail-other::after {
-  background: radial-gradient(circle at bottom right, transparent 11px, #000000 11px);
-  border: 1px solid #FFFFFF;
+/* ===== High-Contrast message bubbles support ===== */
+.high-contrast .message-bubble-self,
+.high-contrast .message-bubble-other {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #FFFFFF !important;
 }
 
 /* ===== Date Separator ===== */

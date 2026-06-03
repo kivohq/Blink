@@ -65,12 +65,12 @@ const MessageItem = ({
     ? "rounded-2xl rounded-tr-sm"
     : "rounded-2xl rounded-tl-sm";
 
-  const commonBubbleClasses = `relative bubble-tail flex flex-col select-text px-4 py-2.5 shadow-sm transition-all no-callout group/bubble ${bubbleRoundness} ${
+  const commonBubbleClasses = `relative flex flex-col select-text px-4 py-2.5 shadow-sm transition-all no-callout group/bubble ${bubbleRoundness} message-bubble ${
     message.isDeleted
-      ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 italic font-normal"
+      ? "bg-slate-100/50 dark:bg-slate-800/50 backdrop-blur-md text-slate-400 dark:text-slate-500 italic font-normal border border-slate-200/20"
       : isSelf
-        ? "bg-gradient-to-br from-[#00D4FF] to-[#0080FF] text-white shadow-lg shadow-primary/20 bubble-tail-self"
-        : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-50 dark:border-slate-700/50 bubble-tail-other"
+        ? "message-bubble-self bg-gradient-to-br from-blue-500/15 to-indigo-600/15 dark:from-blue-500/20 dark:to-indigo-500/20 backdrop-blur-md text-slate-900 dark:text-slate-100 border border-blue-500/25 dark:border-blue-500/30 shadow-md shadow-blue-500/5 hover:shadow-blue-500/10 hover:border-blue-500/40"
+        : "message-bubble-other bg-white/70 dark:bg-slate-900/60 backdrop-blur-md text-slate-900 dark:text-slate-100 border border-white/30 dark:border-slate-800/60 shadow-sm hover:border-slate-300 dark:hover:border-slate-700"
   } hover:cursor-pointer`;
 
   const marginBottom = isNextSameSender ? "mb-1" : "mb-4";
@@ -85,8 +85,8 @@ const MessageItem = ({
       }}
     >
       {!isSelf && (
-        <div className={`flex gap-2 items-end w-full ${showAvatar ? "" : "ml-[52px]"} msg-bubble-container ${isSelf ? "justify-end" : ""}`}>
-          {showAvatar ? (
+        <div className={`flex gap-2 items-end w-full ${showAvatar ? "" : "ml-[44px]"} msg-bubble-container`}>
+          {showAvatar && (
             <div className="flex-shrink-0 select-none mb-0">
               <img
                 src={selectedUser?.profilePic || "/avatar.png"}
@@ -94,8 +94,6 @@ const MessageItem = ({
                 className="size-9 rounded-full object-cover shadow-sm border border-slate-200 dark:border-slate-700"
               />
             </div>
-          ) : !isNextSameSender && (
-            <div className="w-9 flex-shrink-0" />
           )}
           <div className="flex flex-col items-start min-w-0 flex-1">
              <MessageContent 
