@@ -27,8 +27,8 @@ interface ChatState {
   drafts: Record<string, string>;
   isMoreMessagesAvailable: boolean;
   isCommandPaletteOpen: boolean;
-  pendingAttachment: File | null;
   lightboxImage: string | null;
+  setLightboxImage: (img: string | null) => void;
 
   workspaces: IWorkspace[];
   selectedWorkspace: IWorkspace | null;
@@ -124,6 +124,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isMoreMessagesAvailable: true,
   isCommandPaletteOpen: false,
   pendingAttachment: null,
+  lightboxImage: null,
   
 
   workspaces: [],
@@ -806,6 +807,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   toggleCommandPalette: () => set({ isCommandPaletteOpen: !get().isCommandPaletteOpen }),
 
   setPendingAttachment: (attachment) => set({ pendingAttachment: attachment }),
+  setLightboxImage: (lightboxImage) => set({ lightboxImage }),
 
   markAsUnread: (userId) => {
     set({
