@@ -372,6 +372,7 @@ const ImageLightbox = () => {
         <ForwardModal 
           messageId={activeMessage._id} 
           onClose={() => setIsForwardOpen(false)}
+          customSharedUrl={lightboxImage || ""}
         />
       )}
     </div>
