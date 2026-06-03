@@ -55,8 +55,6 @@ const ImageLightbox = () => {
     }
   }, [currentIndex]);
 
-  if (!lightboxImage || currentIndex === -1) return null;
-
   const handlePrev = () => {
     if (currentIndex > 0) {
       setLightboxImage(imageUrls[currentIndex - 1]);
@@ -68,6 +66,23 @@ const ImageLightbox = () => {
       setLightboxImage(imageUrls[currentIndex + 1]);
     }
   };
+
+  // Keyboard navigation (Hook placed unconditionally at top level)
+  useEffect(() => {
+    if (!lightboxImage || currentIndex === -1) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        handlePrev();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
+      } else if (e.key === "Escape") {
+        setLightboxImage(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentIndex, imageUrls, lightboxImage]);
 
   // Touch Swipe Handlers for Mobile Browsers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -90,22 +105,8 @@ const ImageLightbox = () => {
     setTouchStart(null);
   };
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        handlePrev();
-      } else if (e.key === "ArrowRight") {
-        handleNext();
-      } else if (e.key === "Escape") {
-        setLightboxImage(null);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex, imageUrls]);
-
   const handleDownload = () => {
+    if (!lightboxImage) return;
     const a = document.createElement("a");
     a.href = lightboxImage;
     a.download = `blink-image-${Date.now()}.jpg`;
@@ -113,6 +114,9 @@ const ImageLightbox = () => {
     a.click();
     document.body.removeChild(a);
   };
+
+  // Safe early return after all Hooks have been executed
+  if (!lightboxImage || currentIndex === -1) return null;
 
   return (
     <div className="fixed inset-0 z-[20000] flex flex-col justify-between bg-black/98 backdrop-blur-md animate-in fade-in duration-300 select-none">
