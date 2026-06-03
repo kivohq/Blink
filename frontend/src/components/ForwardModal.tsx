@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
+import { useFriendStore } from "../store/useFriendStore";
 import { X, Search, Loader, Share2, Copy, Send, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -10,14 +11,15 @@ const ForwardModal = ({ messageId, onClose, customSharedUrl = "" }) => {
   const [isForwarding, setIsForwarding] = useState(false);
   const [activeShareTab, setActiveShareTab] = useState<'internal' | 'external'>('internal');
   
-  const { users, forwardMessage, messages } = useChatStore();
+  const { forwardMessage, messages } = useChatStore();
   const { authUser } = useAuthStore();
+  const { friends, fetchFriends } = useFriendStore();
 
   // Find the message to get its media/file URL if any
   const msgObj = messages.find(m => m._id === messageId);
   const shareUrl = customSharedUrl || msgObj?.image || msgObj?.file?.url || "";
 
-  const filteredUsers = users.filter(
+  const filteredUsers = friends.filter(
     (user) =>
       user._id !== authUser?._id &&
       (user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,6 +80,10 @@ const ForwardModal = ({ messageId, onClose, customSharedUrl = "" }) => {
     navigator.clipboard.writeText(shareUrl);
     toast.success("Link copied to clipboard!");
   };
+
+  useEffect(() => {
+    fetchFriends();
+  }, [fetchFriends]);
 
   useEffect(() => {
     const handleClose = () => onClose();
@@ -170,7 +176,7 @@ const ForwardModal = ({ messageId, onClose, customSharedUrl = "" }) => {
                     <img 
                       src={user.profilePic || "/avatar.png"} 
                       alt="" 
-                      className="size-8.5 rounded-full object-cover border border-slate-200 dark:border-slate-850"
+                      className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-850 flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 leading-tight">

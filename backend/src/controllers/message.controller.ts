@@ -827,7 +827,11 @@ export const forwardMessage = async (req: AuthRequest, res: Response): Promise<a
     let isHelpCenterReceiver = false;
 
     const receiverUser = await User.findById(receiverId);
-    if (receiverUser && receiverUser.email === helpCenterEmail) {
+    if (!receiverUser) {
+      return res.status(404).json({ error: "Receiver not found" });
+    }
+
+    if (receiverUser.email === helpCenterEmail) {
       isHelpCenterReceiver = true;
     }
 
@@ -835,7 +839,7 @@ export const forwardMessage = async (req: AuthRequest, res: Response): Promise<a
       const friendship = await Friendship.findOne({
         status: "accepted",
         $or: [
-          { requesterId: senderId, receiverId },
+          { requesterId: senderId, receiverId: receiverId },
           { requesterId: receiverId, receiverId: senderId }
         ]
       });
@@ -850,11 +854,6 @@ export const forwardMessage = async (req: AuthRequest, res: Response): Promise<a
       return res.status(404).json({ error: "Message not found" });
     }
 
-    const receiverExists = await User.exists({ _id: receiverId });
-    if (!receiverExists) {
-      return res.status(404).json({ error: "Receiver not found" });
-    }
-
     const forwardedMessage = new Message({
       senderId,
       receiverId,
@@ -867,14 +866,14 @@ export const forwardMessage = async (req: AuthRequest, res: Response): Promise<a
 
     await forwardedMessage.save();
 
-    const receiverSocketId = getReceiverSocketId(receiverId);
+    const receiverSocketId = getReceiverSocketId(receiverId.toString());
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", forwardedMessage);
     }
 
     res.status(201).json(forwardedMessage);
   } catch (error: any) {
-    console.log("Error in forwardMessage: ", error);
+    console.error("Error in forwardMessage: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
