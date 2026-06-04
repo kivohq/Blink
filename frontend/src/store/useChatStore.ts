@@ -1100,7 +1100,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     // Remove optimistic message on failure
     set(state => {
       const list = state.workspaceMessages[channelId] || [];
-      return { workspaceMessages: { ...state.workspaceMessages, [channelId]: list.filter(m => m._id !== tempId) } });
+      return { workspaceMessages: { ...state.workspaceMessages, [channelId]: list.filter(m => m._id !== tempId) } };
+    });
     console.error("Failed to send channel message:", error);
   }
 },
