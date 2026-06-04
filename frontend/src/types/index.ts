@@ -59,6 +59,7 @@ export interface IMessage {
   reactions?: Record<string, string[]>;
   createdAt: string;
   updatedAt: string;
+  isSending?: boolean;
 }
 
 export interface IWorkspace {

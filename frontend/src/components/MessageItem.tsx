@@ -298,9 +298,13 @@ const MessageContent = ({
               <Pin size={10} className="text-amber-400 fill-amber-400" />
             )}
             {isSelf && !message.isDeleted && (
-              message.isRead
-                ? <CheckCheck size={14} className="text-white shadow-sm" />
-                : <Check size={14} className="text-white/50" />
+              message.isSending ? (
+                <span className="text-[9px] text-white/60 italic animate-pulse tracking-wide select-none">sending</span>
+              ) : message.isRead ? (
+                <CheckCheck size={14} className="text-white shadow-sm" />
+              ) : (
+                <Check size={14} className="text-white/50" />
+              )
             )}
           </div>
         </div>

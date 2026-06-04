@@ -63,12 +63,35 @@ const WorkspaceChat = ({ onBurgerClick }) => {
     channelTypingUsers
   } = useChatStore();
 
-  const { authUser } = useAuthStore();
+  const { authUser, socket } = useAuthStore();
 
   const [text, setText] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const typingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      if (socket && selectedWorkspace && selectedChannelId) {
+        socket.emit("channelStopTyping", { workspaceId: selectedWorkspace._id, channelId: selectedChannelId });
+      }
+    };
+  }, [selectedChannelId, selectedWorkspace, socket]);
+
+  const handleTextChange = (e) => {
+    const val = e.target.value;
+    setText(val);
+
+    if (socket && selectedWorkspace && selectedChannelId) {
+      socket.emit("channelTyping", { workspaceId: selectedWorkspace._id, channelId: selectedChannelId });
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        socket.emit("channelStopTyping", { workspaceId: selectedWorkspace._id, channelId: selectedChannelId });
+      }, 2000);
+    }
+  };
 
   // Poll Form State
   const [pollQuestion, setPollQuestion] = useState("");
@@ -109,6 +132,23 @@ const WorkspaceChat = ({ onBurgerClick }) => {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, channelTypingUsers]);
+
+  const getTypingUsersText = () => {
+    if (!selectedWorkspace || !selectedWorkspace.members) return "";
+    const names = channelTypingUsers
+      .map((userId) => {
+        const member = selectedWorkspace.members.find(
+          (m) => typeof m === "object" && m !== null && m._id === userId
+        );
+        return member && typeof member === "object" ? member.fullName : "Someone";
+      })
+      .filter(Boolean);
+
+    if (names.length === 0) return "";
+    if (names.length === 1) return `${names[0]} is typing...`;
+    if (names.length === 2) return `${names[0]} and ${names[1]} are typing...`;
+    return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]} are typing...`;
+  };
 
   // Voice Room Speaker simulation
   useEffect(() => {
@@ -180,6 +220,10 @@ const WorkspaceChat = ({ onBurgerClick }) => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim() && !selectedImage && !selectedFile) return;
+
+    if (socket && selectedWorkspace && selectedChannelId) {
+      socket.emit("channelStopTyping", { workspaceId: selectedWorkspace._id, channelId: selectedChannelId });
+    }
 
     try {
       // For channel messages, we can pass text & file. If image is selected, it's passed as a file/attachment
@@ -411,7 +455,7 @@ const WorkspaceChat = ({ onBurgerClick }) => {
             {channelTypingUsers.length > 0 && (
               <div className="px-4 py-1.5 bg-slate-950/60 border-t border-slate-800 text-xs text-slate-400 font-medium">
                 <span className="text-emerald-500 font-bold animate-pulse">
-                  {channelTypingUsers.length === 1 ? "Someone is typing..." : "Multiple users are typing..."}
+                  {getTypingUsersText()}
                 </span>
               </div>
             )}
@@ -489,7 +533,7 @@ const WorkspaceChat = ({ onBurgerClick }) => {
                   placeholder="Type a message..."
                   value={text}
                   maxLength={1024}
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={handleTextChange}
                   className="flex-1 bg-slate-800 border border-slate-700 hover:border-slate-650 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm rounded-xl px-4 py-2.5 text-slate-100 placeholder-slate-500 transition"
                 />
 

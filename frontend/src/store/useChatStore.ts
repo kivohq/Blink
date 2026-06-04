@@ -243,9 +243,85 @@ export const useChatStore = create<ChatState>((set, get) => ({
   sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
     if (!selectedUser) return;
+    const authUser = useAuthStore.getState().authUser;
+    if (!authUser) return;
+
+    const tempId = "temp-" + Date.now();
+    let text = "";
+    let filePreviewUrl = "";
+    let fileName = "";
+    let fileType = "";
+    let fileSize = 0;
+    let imagePreviewUrl = "";
+    let replyTo = null;
+
+    const isFormData = messageData && typeof messageData.append === "function";
+    if (isFormData) {
+      text = messageData.get("text") as string || "";
+      const fileVal = messageData.get("file");
+      if (fileVal && typeof fileVal !== "string") {
+        fileName = (fileVal as File).name;
+        fileType = (fileVal as File).type;
+        fileSize = (fileVal as File).size;
+        filePreviewUrl = URL.createObjectURL(fileVal as File);
+      }
+      const imageVal = messageData.get("image");
+      if (imageVal) {
+        if (typeof imageVal === "string") {
+          imagePreviewUrl = imageVal;
+        } else {
+          imagePreviewUrl = URL.createObjectURL(imageVal as File);
+        }
+      }
+      replyTo = messageData.get("replyTo") as string || null;
+    } else {
+      text = messageData.text || "";
+      if (messageData.file) {
+        fileName = messageData.file.name;
+        fileType = messageData.file.type;
+        fileSize = messageData.file.size;
+        filePreviewUrl = URL.createObjectURL(messageData.file);
+      }
+      if (messageData.image) {
+        if (typeof messageData.image === "string") {
+          imagePreviewUrl = messageData.image;
+        } else {
+          imagePreviewUrl = URL.createObjectURL(messageData.image);
+        }
+      }
+      replyTo = messageData.replyTo || null;
+    }
+
+    const tempMessage: IMessage = {
+      _id: tempId,
+      senderId: authUser._id,
+      receiverId: selectedUser._id,
+      text,
+      image: imagePreviewUrl || undefined,
+      file: filePreviewUrl ? {
+        url: filePreviewUrl,
+        name: fileName,
+        type: fileType,
+        size: fileSize
+      } : undefined,
+      isRead: false,
+      isEdited: false,
+      isDeleted: false,
+      isPinned: false,
+      reactions: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isSending: true,
+      replyTo: replyTo || undefined
+    };
+
+    set({
+      messages: [...messages, tempMessage],
+      replyingToMessage: null
+    });
+
     try {
       let postData;
-      const isFormData = messageData && typeof messageData.append === "function";
       if (isFormData) {
         postData = messageData;
       } else {
@@ -260,12 +336,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
 
       const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, postData);
+      
+      const updatedMessages = get().messages.map(msg => 
+        msg._id === tempId ? res.data : msg
+      );
       set({ 
-        messages: [...messages, res.data], 
-        replyingToMessage: null,
+        messages: updatedMessages, 
         users: get().users.map(u => u._id === selectedUser._id ? { ...u, lastMessage: res.data } : (u as any))
       });
     } catch (error: any) {
+      set({
+        messages: get().messages.filter(msg => msg._id !== tempId)
+      });
       useErrorStore.getState().handleApiError(error, "send message");
     }
   },
@@ -495,9 +577,25 @@ export const useChatStore = create<ChatState>((set, get) => ({
         (newMessage.senderId === selectedUser._id || newMessage.receiverId === selectedUser._id);
 
       if (isForActiveChat) {
-        set({
-          messages: [...messages, newMessage],
-        });
+        const isDuplicate = messages.some(msg => msg._id === newMessage._id);
+        if (isDuplicate) return;
+
+        const tempMsgIndex = messages.findIndex(msg => 
+          msg.isSending && 
+          msg.senderId === newMessage.senderId &&
+          (newMessage.text ? msg.text === newMessage.text : true)
+        );
+
+        if (tempMsgIndex > -1) {
+          const updated = [...messages];
+          updated[tempMsgIndex] = newMessage;
+          set({ messages: updated });
+        } else {
+          set({
+            messages: [...messages, newMessage],
+          });
+        }
+
         try {
           await axiosInstance.patch(`/messages/${selectedUser._id}/read`);
           socket.emit("messageRead", { senderId: selectedUser._id, receiverId: useAuthStore.getState().authUser?._id });
@@ -945,21 +1043,67 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   sendChannelMessage: async (workspaceId, channelId, text, file = null) => {
-    try {
-      const formData = new FormData();
-      formData.append("text", text || "");
-      if (file) formData.append("file", file);
-      const res = await axiosInstance.post(`/workspaces/${workspaceId}/messages/${channelId}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      const newMsg = res.data;
-      const list = get().workspaceMessages[channelId] || [];
-      if (list.some(msg => msg._id === newMsg._id)) return;
-      set({ workspaceMessages: { ...get().workspaceMessages, [channelId]: [...list, newMsg] } });
-    } catch (error) {
-      console.error("Failed to send channel message:", error);
-    }
-  },
+  try {
+    const authUser = useAuthStore.getState().authUser;
+    if (!authUser) return;
+    const tempId = "temp-" + Date.now();
+    const tempMessage: IMessage = {
+      _id: tempId,
+      senderId: authUser._id,
+      text,
+      image: undefined,
+      file: file ? {
+        url: URL.createObjectURL(file),
+        name: file.name,
+        type: file.type,
+        size: file.size
+      } : undefined,
+      isRead: false,
+      isEdited: false,
+      isDeleted: false,
+      isPinned: false,
+      reactions: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isSending: true,
+      // include channelId for workspace messages if needed
+      // @ts-ignore
+      channelId,
+    } as any;
+    // Optimistically add to UI
+    set(state => {
+      const list = state.workspaceMessages[channelId] || [];
+      return {
+        workspaceMessages: {
+          ...state.workspaceMessages,
+          [channelId]: [...list, tempMessage]
+        }
+      };
+    });
+
+    // Prepare form data for actual request
+    const formData = new FormData();
+    formData.append("text", text || "");
+    if (file) formData.append("file", file);
+    const res = await axiosInstance.post(`/workspaces/${workspaceId}/messages/${channelId}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+    const newMsg = res.data;
+    // Replace optimistic message with server response
+    set(state => {
+      const list = state.workspaceMessages[channelId] || [];
+      const idx = list.findIndex(m => m._id === tempId);
+      const newList = idx > -1 ? [...list.slice(0, idx), newMsg, ...list.slice(idx + 1)] : [...list, newMsg];
+      return { workspaceMessages: { ...state.workspaceMessages, [channelId]: newList } };
+    });
+  } catch (error) {
+    // Remove optimistic message on failure
+    set(state => {
+      const list = state.workspaceMessages[channelId] || [];
+      return { workspaceMessages: { ...state.workspaceMessages, [channelId]: list.filter(m => m._id !== tempId) } });
+    console.error("Failed to send channel message:", error);
+  }
+},
 
   addChannelReaction: async (channelId, messageId, emoji) => {
     try {

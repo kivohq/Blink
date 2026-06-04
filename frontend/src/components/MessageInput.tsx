@@ -182,7 +182,6 @@ const MessageInput = () => {
 
     try {
       setIsSending(true);
-      await new Promise((resolve) => { sendingDelayRef.current = setTimeout(resolve, 300); });
       const formData = new FormData();
       if (text.trim()) formData.append("text", text.trim());
       if (imagePreview) formData.append("image", imagePreview);
