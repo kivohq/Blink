@@ -21,6 +21,7 @@ import CommandPalette from "./components/CommandPalette";
 import ImageLightbox from "./components/ImageLightbox";
 
 import { ContextMenuProvider } from "./components/ContextMenu";
+import ThemeProvider from "./lib/ThemeProvider";
 
 const App: React.FC = () => {
   const { authUser, checkAuth, isCheckingAuth, socket } = useAuthStore();
@@ -102,35 +103,27 @@ const App: React.FC = () => {
     );
 
   const isHomePage = location.pathname === "/";
-
   return (
-    <ContextMenuProvider>
-      <div className="min-h-screen bg-background dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
-        {!(authUser && isHomePage) && (
-          <Navbar />
-        )}
-
-        <Routes>
-          <Route path="/" element={authUser ? <AppLayout /> : <Navigate to="/login" />} />
-          <Route path="/u/:username" element={authUser ? <AppLayout /> : <Navigate to="/login" />} />
-          <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
-          <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
-        </Routes>
-
-        <Toaster />
-
-        <ErrorModal
-          error={currentError?.error}
-          onClose={clearError}
-          onRetry={currentError?.onRetry ? retryCurrentError : null}
-        />
-
-        <CommandPalette />
-        <ImageLightbox />
-      </div>
-    </ContextMenuProvider>
+    <ThemeProvider>
+      <ContextMenuProvider>
+        <div className="min-h-screen bg-background dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
+          {!(authUser && isHomePage) && (
+            <Navbar />
+          )}
+          <Routes>
+            <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+          </Routes>
+          <Toaster />
+          <ErrorModal
+            error={currentError?.error}
+            onClose={clearError}
+            onRetry={currentError?.onRetry ? retryCurrentError : null}
+          />
+          <CommandPalette />
+          <ImageLightbox />
+        </div>
+      </ContextMenuProvider>
+    </ThemeProvider>
   );
 };
 export default App;

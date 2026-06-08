@@ -24,7 +24,7 @@ const Navbar = () => {
       
       <header
         data-context="navbar"
-        className="bg-surface/80 dark:bg-surface-dark/80 border-b border-border dark:border-border-dark fixed w-full top-0 z-40 backdrop-blur-md transition-colors duration-200"
+        className="glass border-b border-border dark:border-border-dark fixed w-full top-0 z-40 backdrop-blur-md transition-colors duration-200"
       >
         <div className="container mx-auto px-4 h-16">
           <div className="flex items-center justify-between h-full">

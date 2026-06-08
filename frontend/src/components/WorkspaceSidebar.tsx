@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
-import { 
+import { Megaphone, BadgeInfo, X } from "lucide-react"; 
   Hash, 
   Megaphone, 
   BarChart2, 
@@ -31,6 +31,7 @@ const WorkspaceSidebar = () => {
   const [newChannelName, setNewChannelName] = useState("");
   const [newChannelType, setNewChannelType] = useState("chat");
   const [showMembers, setShowMembers] = useState(true);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
 
   if (!selectedWorkspace) return null;
 
@@ -59,7 +60,28 @@ const WorkspaceSidebar = () => {
 
   return (
     <aside className="w-64 h-full glass border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 flex-shrink-0 select-none transition-colors duration-200">
+        {/* Announcement Modal */}
+        {showAnnouncementModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowAnnouncementModal(false)}>
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg max-w-md w-full p-6 relative animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+              <button className="absolute top-2 right-2 p-1 rounded hover:bg-slate-200/40 dark:hover:bg-slate-800/40" onClick={() => setShowAnnouncementModal(false)}>
+                <X className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+              </button>
+              <h2 className="text-lg font-bold mb-4 text-slate-800 dark:text-slate-100">🆕 New Features (v2.3.0)</h2>
+              <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                <li>Real‑time typing indicators for all users.</li>
+                <li>Optimistic UI for channel messages.</li>
+                <li>Enhanced dark‑mode glassmorphic sidebar.</li>
+                <li>Announcement modal to showcase new features.</li>
+              </ul>
+            </div>
+          </div>
+        )}
       {/* Group Header */}
+        <button className="w-full flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/40 rounded" onClick={() => setShowAnnouncementModal(true)}>
+          <BadgeInfo className="w-4 h-4" />
+          <span>What’s New</span>
+        </button>
       <div className="h-16 px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between hover:bg-slate-200/50 dark:hover:bg-slate-800/40 cursor-pointer transition">
         <div className="flex flex-col">
           <span className="font-bold text-slate-800 dark:text-slate-100 text-sm truncate max-w-[180px]">

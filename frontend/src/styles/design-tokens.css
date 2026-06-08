@@ -1,0 +1,55 @@
+/* Design Tokens – CSS Variables */
+:root {
+  /* Primary colors */
+  --color-primary: 0, 217, 255; /* default cyan */
+  --color-primary-foreground: 255, 255, 255;
+  /* Accent colors */
+  --color-accent: 255, 165, 0; /* orange */
+  --color-accent-foreground: 0, 0, 0;
+  /* Background colors */
+  --color-background: 255, 255, 255;
+  --color-background-dark: 2, 6, 23; /* dark bg */
+  --color-background-high-contrast: 0, 0, 0;
+  /* Surface */
+  --color-surface: 255, 255, 255;
+  --color-surface-dark: 2, 6, 23;
+  --color-surface-high-contrast: 0, 0, 0;
+  /* Border */
+  --color-border: 241, 245, 249;
+  --color-border-dark: 30, 41, 59;
+  --color-border-high-contrast: 255, 255, 255;
+  /* Text */
+  --color-text: 15, 23, 42;
+  --color-text-dark: 241, 245, 249;
+  --color-text-high-contrast: 255, 255, 255;
+}
+
+[data-theme="dark"] {
+  --color-primary: 0, 174, 239; /* darker cyan */
+  --color-background: var(--color-background-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-border: var(--color-border-dark);
+  --color-text: var(--color-text-dark);
+}
+
+[data-theme="high-contrast"] {
+  --color-primary: 0, 255, 0; /* bright green */
+  --color-background: var(--color-background-high-contrast);
+  --color-surface: var(--color-surface-high-contrast);
+  --color-border: var(--color-border-high-contrast);
+  --color-text: var(--color-text-high-contrast);
+}
+
+/* Utility classes for glass effect and focus-visible */
+.glass {
+  background: rgba(var(--color-surface), 0.6);
+  backdrop-filter: blur(12px);
+  border-radius: var(--rounded-xl, 1rem);
+  border: 1px solid rgba(var(--color-border), 0.2);
+}
+
+.focus-visible {
+  outline: none;
+  ring: 2px solid rgba(var(--color-primary), 0.6);
+  ring-offset: 2px;
+}
