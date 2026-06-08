@@ -29,6 +29,10 @@ const messageSchema = new Schema<IMessageDocument>(
       type: { type: String },
       size: { type: Number },
     },
+    deliveredAt: {
+      type: Date,
+      default: null,
+    },
     isRead: {
       type: Boolean,
       default: false,

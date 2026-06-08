@@ -288,7 +288,7 @@ export const sendMessage = [
 
       const newMessage = new Message({
         senderId,
-        receiverId,
+        deliveredAt: new Date(),
         text,
         image: imageUrl,
         file: fileData,
@@ -301,12 +301,15 @@ export const sendMessage = [
       await newMessage.save();
       await newMessage.populate("replyTo");
 
-      const receiverSocketId = getReceiverSocketId(receiverId);
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", newMessage);
-      }
-
-      // Send notification
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+        // Emit delivery status to sender
+        const senderSocketId = getReceiverSocketId(senderId.toString());
+        if (senderSocketId) {
+          io.to(senderSocketId).emit("messageDelivered", { messageId: newMessage._id, deliveredAt: newMessage.deliveredAt });
+        }
       const sender = req.user;
       NotificationService.createNotification({
         recipient: receiverId,

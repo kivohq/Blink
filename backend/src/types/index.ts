@@ -53,6 +53,7 @@ export interface IMessage {
     size: number;
   } | null;
   isRead: boolean;
+  deliveredAt?: Date;
   readAt?: Date;
   replyTo?: string | Types.ObjectId | IMessage | null;
   forwardedFrom?: string | Types.ObjectId | IMessage | null;

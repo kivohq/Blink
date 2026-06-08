@@ -646,6 +646,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
           msg.receiverId === userId ? { ...msg, isRead: true } : msg
         ),
       });
+    // Handle delivery receipt
+    socket.on("messageDelivered", (data: { messageId: string; deliveredAt: string }) => {
+      set({
+        messages: get().messages.map(msg =>
+          msg._id === data.messageId ? { ...msg, deliveredAt: data.deliveredAt } : msg
+        ),
+      });
+    });
     });
 
     socket.on("messageReactionAdded", (data: any) => {

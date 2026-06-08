@@ -302,9 +302,9 @@ const MessageContent = ({
                 <span className="text-[9px] text-white/60 italic animate-pulse tracking-wide select-none">sending</span>
               ) : message.isRead ? (
                 <CheckCheck size={14} className="text-white shadow-sm" />
-              ) : (
+              ) : message.deliveredAt ? (
                 <Check size={14} className="text-white/50" />
-              )
+              ) : null
             )}
           </div>
         </div>
