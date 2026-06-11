@@ -26,10 +26,35 @@ export const signup = catchAsync(async (req: AuthRequest, res: Response, next: N
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
+  // Generate unique, length-safe default username and handle
+  const emailPrefix = email.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
+  let baseUsername = emailPrefix || fullName.toLowerCase().replace(/[^a-z0-9_]/g, "") || "user";
+  if (baseUsername.length > 20) {
+    baseUsername = baseUsername.slice(0, 20);
+  }
+
+  let username = baseUsername;
+  let handle = `@${baseUsername}`;
+
+  let usernameExists = await User.findOne({ username });
+  let handleExists = await User.findOne({ handle });
+  let counter = 1;
+
+  while (usernameExists || handleExists) {
+    const suffix = counter.toString();
+    username = `${baseUsername.slice(0, 29 - suffix.length)}${suffix}`;
+    handle = `@${baseUsername.slice(0, 19 - suffix.length)}${suffix}`;
+    usernameExists = await User.findOne({ username });
+    handleExists = await User.findOne({ handle });
+    counter++;
+  }
+
   const newUser = new User({
     fullName,
     email,
     password: hashedPassword,
+    username,
+    handle,
   });
 
   if (newUser) {

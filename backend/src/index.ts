@@ -93,6 +93,8 @@ async function seedHelpCenter() {
         fullName: "Help Center",
         password: hashedPassword,
         profilePic: "",
+        username: "help_center",
+        handle: "@help_center",
       });
       await helpCenter.save();
       console.log("Help Center user seeded successfully.");

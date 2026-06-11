@@ -27,12 +27,6 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isFullScreenPage = ["/login", "/signup", "/settings", "/profile"].includes(location.pathname);
-
-  if (isFullScreenPage) {
-    return <Outlet />;
-  }
-
   useEffect(() => {
     localStorage.setItem("lastActiveTab", activeTab);
   }, [activeTab]);
@@ -52,6 +46,12 @@ const AppLayout = () => {
       }
     }
   }, [username, users, isUsersLoading, setSelectedUser, handleError, navigate]);
+
+  const isFullScreenPage = ["/login", "/signup", "/settings", "/profile"].includes(location.pathname);
+
+  if (isFullScreenPage) {
+    return <Outlet />;
+  }
 
   const renderSideContent = () => {
     if (selectedWorkspace) return <WorkspaceSidebar />;
