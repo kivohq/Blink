@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
-import { Megaphone, BadgeInfo, X } from "lucide-react"; 
-  Hash, 
-  Megaphone, 
-  BarChart2, 
-  FolderOpen, 
-  Plus, 
-  Users, 
-  ChevronDown,
-  Volume2
-} from "lucide-react";
+import { Megaphone, BadgeInfo, X, Hash, BarChart2, FolderOpen, Plus, Users, ChevronDown, Volume2 } from "lucide-react";
 
 const WorkspaceSidebar = () => {
   const { 
