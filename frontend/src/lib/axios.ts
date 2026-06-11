@@ -20,3 +20,27 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Response interceptor to handle 401 Unauthorized globally
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      // Clear stored token
+      localStorage.removeItem('token');
+      // Optionally show a toast notification
+      try {
+        // Dynamically import toast to avoid circular imports
+        const toast = require('react-hot-toast').default;
+        toast.error('Session expired. Please log in again.');
+      } catch (e) {
+        // ignore if toast import fails
+      }
+      // Redirect to login page if possible
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);

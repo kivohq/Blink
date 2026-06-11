@@ -46,8 +46,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
       get().connectSocket();
-    } catch (error) {
-      console.log("Error in checkAuth:", error);
+    } catch (error: any) {
+      // If the token is invalid or expired (401), clear it to force re-login
+      if (error?.response?.status === 401) {
+        localStorage.removeItem('token');
+        toast.error('Session expired. Please log in again.');
+      } else {
+        toast.error(error?.response?.data?.message || 'Error checking authentication');
+      }
+      console.log('Error in checkAuth:', error);
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });

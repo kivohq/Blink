@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
-import Navbar from "./components/Navbar";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
+import Navbar from "./components/Navbar";
 import AppLayout from "./AppLayout";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
 import { useErrorStore } from "./store/useErrorStore";
@@ -19,7 +19,6 @@ import { Toaster } from "react-hot-toast";
 import ErrorModal from "./components/ErrorModal";
 import CommandPalette from "./components/CommandPalette";
 import ImageLightbox from "./components/ImageLightbox";
-
 import { ContextMenuProvider } from "./components/ContextMenu";
 import ThemeProvider from "./lib/ThemeProvider";
 
@@ -28,36 +27,35 @@ const App: React.FC = () => {
   const { theme } = useThemeStore();
   const { currentError, clearError, retryCurrentError } = useErrorStore();
   const { toggleCommandPalette, setCommandPaletteOpen, setEditingMessage, setReplyingToMessage } = useChatStore();
+  const { fetchFriends, fetchRequests, subscribeToFriendEvents, unsubscribeFromFriendEvents } = useFriendStore();
+  const { subscribeToMessages, unsubscribeFromMessages, initWorkspaces } = useChatStore();
   const location = useLocation();
 
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-      const isCommandK = (isMac ? (e as any).metaKey : (e as any).ctrlKey) && (e as any).key === "k";
-
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const isCommandK = (isMac ? (e as any).metaKey : (e as any).ctrlKey) && e.key === "k";
       if (isCommandK) {
         e.preventDefault();
         toggleCommandPalette();
       }
-
       if ((e as any).key === "Escape") {
         setCommandPaletteOpen(false);
         setEditingMessage(null);
         setReplyingToMessage(null);
       }
     };
-
     window.addEventListener("keydown", handleKeyDown as any);
     return () => window.removeEventListener("keydown", handleKeyDown as any);
   }, [toggleCommandPalette, setCommandPaletteOpen, setEditingMessage, setReplyingToMessage]);
 
+  // Initial auth check
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  const { fetchFriends, fetchRequests, subscribeToFriendEvents, unsubscribeFromFriendEvents } = useFriendStore();
-  const { subscribeToMessages, unsubscribeFromMessages, initWorkspaces } = useChatStore();
-
+  // Load user data once authenticated
   useEffect(() => {
     if (authUser && socket) {
       fetchFriends();
@@ -72,10 +70,10 @@ const App: React.FC = () => {
     }
   }, [authUser, socket, fetchFriends, fetchRequests, subscribeToFriendEvents, unsubscribeFromFriendEvents, subscribeToMessages, unsubscribeFromMessages, initWorkspaces]);
 
+  // Theme handling
   useEffect(() => {
     const root = document.documentElement;
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
     const applyTheme = () => {
       const isDark = theme === "dark" || (theme === "system" && mediaQuery.matches);
       if (isDark) {
@@ -86,39 +84,39 @@ const App: React.FC = () => {
         root.setAttribute("data-theme", "light");
       }
     };
-
     applyTheme();
-
     if (theme === "system") {
       mediaQuery.addEventListener("change", applyTheme);
       return () => mediaQuery.removeEventListener("change", applyTheme);
     }
   }, [theme]);
 
-  if (isCheckingAuth && !authUser)
+  // Loading spinner while auth is being verified
+  if (isCheckingAuth && !authUser) {
     return (
       <div className="flex items-center justify-center h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
         <Loader className="size-10 animate-spin text-primary" />
       </div>
     );
+  }
 
   const isHomePage = location.pathname === "/";
+
   return (
     <ThemeProvider>
       <ContextMenuProvider>
         <div className="min-h-screen bg-background dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
-          {!(authUser && isHomePage) && (
-            <Navbar />
-          )}
+          {!(authUser && isHomePage) && <Navbar />}
           <Routes>
-            <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+            <Route path="/" element={<AppLayout />}> 
+              <Route index element={<SignUpPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
           </Routes>
           <Toaster />
-          <ErrorModal
-            error={currentError?.error}
-            onClose={clearError}
-            onRetry={currentError?.onRetry ? retryCurrentError : null}
-          />
+          <ErrorModal error={currentError?.error} onClose={clearError} onRetry={currentError?.onRetry ? retryCurrentError : null} />
           <CommandPalette />
           <ImageLightbox />
         </div>
@@ -126,4 +124,5 @@ const App: React.FC = () => {
     </ThemeProvider>
   );
 };
+
 export default App;
