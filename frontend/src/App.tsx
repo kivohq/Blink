@@ -99,6 +99,11 @@ const App: React.FC = () => {
       </div>
     );
   }
+  // Redirect unauthenticated users to login page
+  if (!authUser && location.pathname !== "/login") {
+    return <Navigate to="/login" replace />;
+  }
+
 
   const isHomePage = location.pathname === "/";
 
