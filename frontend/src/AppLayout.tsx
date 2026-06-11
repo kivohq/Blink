@@ -11,7 +11,7 @@ import NotificationPanel from "./components/NotificationPanel";
 import SettingsPage from "./pages/SettingsPage";
 import { useChatStore } from "./store/useChatStore";
 import { useErrorStore } from "./store/useErrorStore";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Outlet } from "react-router-dom";
 import UserProfileModal from "./components/UserProfileModal";
 import { getUserHandle } from "./lib/utils";
 
@@ -25,6 +25,13 @@ const AppLayout = () => {
 
   const { username } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isFullScreenPage = ["/login", "/signup", "/settings", "/profile"].includes(location.pathname);
+
+  if (isFullScreenPage) {
+    return <Outlet />;
+  }
 
   useEffect(() => {
     localStorage.setItem("lastActiveTab", activeTab);

@@ -22,6 +22,31 @@ import ImageLightbox from "./components/ImageLightbox";
 import { ContextMenuProvider } from "./components/ContextMenu";
 import ThemeProvider from "./lib/ThemeProvider";
 
+interface RequireAuthProps {
+  children: React.ReactNode;
+}
+
+const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
+  const { authUser, isCheckingAuth } = useAuthStore();
+  const location = useLocation();
+
+  if (isCheckingAuth) {
+    return null;
+  }
+
+  const isPublicRoute = location.pathname === "/login" || location.pathname === "/signup";
+
+  if (!authUser && !isPublicRoute) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (authUser && isPublicRoute) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 const App: React.FC = () => {
   const { authUser, checkAuth, isCheckingAuth, socket } = useAuthStore();
   const { theme } = useThemeStore();
@@ -99,11 +124,6 @@ const App: React.FC = () => {
       </div>
     );
   }
-  // Redirect unauthenticated users to login page, but avoid redirect loop
-  if (!authUser && location.pathname !== '/login') {
-    return <Navigate to="/login" replace />;
-  }
-
   const isHomePage = location.pathname === "/";
 
   return (
@@ -111,14 +131,17 @@ const App: React.FC = () => {
       <ContextMenuProvider>
         <div className="min-h-screen bg-background dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
           {!(authUser && isHomePage) && <Navbar />}
-          <Routes>
-            <Route path="/" element={<AppLayout />}>
-              <Route index element={<SignUpPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
-          </Routes>
+          <RequireAuth>
+            <Routes>
+              <Route path="/" element={<AppLayout />}>
+                <Route index element={<SignUpPage />} />
+                <Route path="signup" element={<SignUpPage />} />
+                <Route path="login" element={<LoginPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+              </Route>
+            </Routes>
+          </RequireAuth>
           <Toaster />
           <ErrorModal error={currentError?.error} onClose={clearError} onRetry={currentError?.onRetry ? retryCurrentError : null} />
           <CommandPalette />

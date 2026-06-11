@@ -36,8 +36,8 @@ axiosInstance.interceptors.response.use(
       } catch (e) {
         // ignore if toast import fails
       }
-      // Redirect to login page if possible
-      if (typeof window !== 'undefined') {
+      // Redirect to login page if possible, but avoid redirect loop
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
         window.location.href = '/login';
       }
     }
