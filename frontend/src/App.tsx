@@ -50,10 +50,10 @@ const App: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown as any);
   }, [toggleCommandPalette, setCommandPaletteOpen, setEditingMessage, setReplyingToMessage]);
 
-  // Initial auth check
+  // Initial auth check (runs once on mount)
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+  }, []);
 
   // Load user data once authenticated
   useEffect(() => {
@@ -99,11 +99,10 @@ const App: React.FC = () => {
       </div>
     );
   }
-  // Redirect unauthenticated users to login page
-  if (!authUser && location.pathname !== "/login") {
+  // Redirect unauthenticated users to login page, but avoid redirect loop
+  if (!authUser && location.pathname !== '/login') {
     return <Navigate to="/login" replace />;
   }
-
 
   const isHomePage = location.pathname === "/";
 
@@ -113,7 +112,7 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-background dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
           {!(authUser && isHomePage) && <Navbar />}
           <Routes>
-            <Route path="/" element={<AppLayout />}> 
+            <Route path="/" element={<AppLayout />}>
               <Route index element={<SignUpPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="settings" element={<SettingsPage />} />
